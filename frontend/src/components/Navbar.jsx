@@ -9,7 +9,7 @@ export default function Navbar() {
     <nav className="navbar">
       <div className="navbar-inner">
         <Link to="/" className="navbar-brand">
-          <div className="navbar-logo">🌼</div>
+          <img src="/logo.png" alt="蒲公英聽語協會" className="navbar-logo" />
           <div className="navbar-title">
             <span className="navbar-title-main">蒲公英聽語協會</span>
             <span className="navbar-title-sub">Dandelion Hearing & Language</span>

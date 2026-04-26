@@ -5,12 +5,12 @@ export default function Footer() {
         <div className="footer-grid">
           <div>
             <div className="footer-brand">
-              <span style={{ fontSize: 24 }}>🌼</span>
+              <img src="/logo.png" alt="蒲公英聽語協會" style={{ width: 28, height: 28, objectFit: 'contain' }} />
               <span className="footer-brand-name">蒲公英聽語協會</span>
             </div>
             <p className="footer-desc">
               我們始終相信愛心就像蒲公英，只要有風，就能隨風起舞，
-              吹進每個需要幫助的聽損家庭。每一份義賣收益，都用於支持聽損兒童及其家庭。
+              吹進每個需要幫助的聽損家庭。每一份義賣收益，都用於支持聽損族群的需要。
             </p>
           </div>
           <div>
@@ -31,7 +31,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="footer-bottom">
-          © {new Date().getFullYear()} 蒲公英聽語協會 版權所有｜本網站義賣所得全數用於聽損兒童服務
+          © {new Date().getFullYear()} 蒲公英聽語協會 版權所有｜本網站義賣所得全數用於聽損族群服務
         </div>
       </div>
     </footer>

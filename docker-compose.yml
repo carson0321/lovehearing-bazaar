@@ -2,40 +2,48 @@ version: '3.8'
 
 services:
   postgres:
-    image: postgres:16-alpine
+    image: postgres:${POSTGRES_VERSION:-16}-alpine
     container_name: bazaar-db
+    env_file: .env
     environment:
-      POSTGRES_DB: bazaar
-      POSTGRES_USER: bazaar_user
-      POSTGRES_PASSWORD: bazaar_pass
+      POSTGRES_DB: ${POSTGRES_DB:-bazaar}
+      POSTGRES_USER: ${POSTGRES_USER:-bazaar_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U bazaar_user -d bazaar"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-bazaar_user} -d ${POSTGRES_DB:-bazaar}"]
       interval: 5s
       timeout: 5s
       retries: 10
 
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      args:
+        NODE_VERSION: ${NODE_VERSION:-20}
     container_name: bazaar-backend
+    env_file: .env
     environment:
-      DATABASE_URL: postgresql://bazaar_user:bazaar_pass@postgres:5432/bazaar
-      JWT_SECRET: lovehearing_dandelion_secret_2024
-      PORT: 3001
-      ADMIN_USERNAME: admin
-      ADMIN_PASSWORD: lovehearing2024
+      DATABASE_URL: postgresql://${POSTGRES_USER:-bazaar_user}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-bazaar}
+      JWT_SECRET: ${JWT_SECRET}
+      PORT: ${PORT:-3001}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
     depends_on:
       postgres:
         condition: service_healthy
     ports:
-      - "3001:3001"
+      - "${PORT:-3001}:${PORT:-3001}"
     restart: unless-stopped
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        NODE_VERSION: ${NODE_VERSION:-20}
     container_name: bazaar-frontend
     ports:
       - "3000:80"

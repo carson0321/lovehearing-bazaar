@@ -60,7 +60,9 @@ function LoginForm({ onLogin }) {
   return (
     <div className="admin-login">
       <div className="admin-login-card">
-        <div className="admin-login-logo">🌼</div>
+        <div className="admin-login-logo">
+          <img src="/logo.png" alt="蒲公英聽語協會" style={{ width: 64, height: 64, objectFit: 'contain' }} />
+        </div>
         <h1 className="admin-login-title">後台管理系統</h1>
         <p className="admin-login-subtitle">蒲公英聽語協會義賣管理</p>
 
@@ -98,9 +100,7 @@ function LoginForm({ onLogin }) {
           </button>
         </form>
 
-        <div style={{ marginTop: 20, padding: '12px 16px', background: '#f8f9fa', borderRadius: 8, fontSize: 12, color: '#636e72' }}>
-          預設帳號：admin<br />預設密碼：lovehearing2024
-        </div>
+
       </div>
     </div>
   );
@@ -216,7 +216,7 @@ function Dashboard({ username, onLogout }) {
     <div className="admin-page">
       <div className="admin-navbar">
         <div className="admin-navbar-brand">
-          <span style={{ fontSize: 22 }}>🌼</span>
+          <img src="/logo.png" alt="logo" style={{ width: 28, height: 28, objectFit: 'contain' }} />
           蒲公英義賣後台管理
         </div>
         <div className="admin-navbar-right">

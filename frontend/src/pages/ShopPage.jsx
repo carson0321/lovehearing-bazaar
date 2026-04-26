@@ -28,14 +28,14 @@ export default function ShopPage() {
     <>
       {/* Hero */}
       <section className="hero">
-        <div className="hero-badge">🌼 愛心義賣活動進行中</div>
+        <div className="hero-badge">愛心義賣活動進行中</div>
         <h1 className="hero-title">
           每一份購買<br />
-          都是對<span>聽損家庭</span>的支持
+          都是對<span>聽損族群</span>的支持
         </h1>
         <p className="hero-desc">
           蒲公英聽語協會義賣商品，每件商品皆由愛心志工精心製作或嚴選。
-          所有收益將全數用於支持聽損兒童的語言治療與教育服務。
+          所有收益將全數用於支持聽損兒童的語言治療、教育服務與聽損族群的需要。
         </p>
         <div className="hero-stats">
           <div className="hero-stat">

@@ -38,7 +38,8 @@ export default function OrderSuccessPage() {
             textAlign: 'left',
           }}
         >
-          🌼 您的愛心將幫助更多聽損兒童得到語言治療支持，謝謝您！
+          <img src="/logo.png" alt="" style={{ width: 18, height: 18, objectFit: 'contain', verticalAlign: 'middle', marginRight: 6 }} />
+          您的愛心將幫助更多聽損族群得到支持，謝謝您！
         </div>
 
         <Link to="/" className="back-to-shop-btn">
