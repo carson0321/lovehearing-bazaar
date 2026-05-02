@@ -202,6 +202,21 @@ export default function CheckoutPage() {
           </div>
         </div>
       </div>
+
+      {/* Mobile sticky bottom bar */}
+      <div className="checkout-mobile-bar">
+        <div className="checkout-mobile-bar-total">
+          <div className="checkout-mobile-bar-label">訂單合計</div>
+          <div className="checkout-mobile-bar-amount">NT${totalAmount.toLocaleString()}</div>
+        </div>
+        <button
+          className="checkout-mobile-bar-btn"
+          onClick={handleSubmit}
+          disabled={submitting}
+        >
+          {submitting ? <><span className="spinner" /> 處理中</> : '確認下單 ✓'}
+        </button>
+      </div>
     </div>
   );
 }
