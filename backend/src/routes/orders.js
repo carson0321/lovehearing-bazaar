@@ -5,10 +5,10 @@ const authMiddleware = require('../middleware/auth');
 const router = express.Router();
 
 router.post('/', async (req, res) => {
-  const { customer_name, customer_email, customer_phone, note, items } = req.body;
+  const { customer_name, customer_email, customer_phone, line_id, note, items } = req.body;
 
-  if (!customer_name || !customer_email || !items || items.length === 0) {
-    return res.status(400).json({ error: '請填寫姓名、Email，並選擇至少一件商品' });
+  if (!customer_name || !customer_phone || !items || items.length === 0) {
+    return res.status(400).json({ error: '請填寫姓名、聯絡電話，並選擇至少一件商品' });
   }
 
   const client = await pool.connect();
@@ -43,9 +43,9 @@ router.post('/', async (req, res) => {
 
     const orderNumber = 'ORD-' + Date.now().toString().slice(-8);
     const orderResult = await client.query(
-      `INSERT INTO orders (order_number, customer_name, customer_email, customer_phone, note, total_amount)
-       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-      [orderNumber, customer_name, customer_email, customer_phone || '', note || '', total]
+      `INSERT INTO orders (order_number, customer_name, customer_email, customer_phone, line_id, note, total_amount)
+       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+      [orderNumber, customer_name, customer_email || '', customer_phone, line_id || '', note || '', total]
     );
     const order = orderResult.rows[0];
 

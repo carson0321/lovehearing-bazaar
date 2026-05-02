@@ -12,6 +12,8 @@ async function initDB() {
     await client.query(schema);
     await client.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS image_data BYTEA`);
     await client.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS image_mime_type VARCHAR(50)`);
+    await client.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS line_id VARCHAR(100)`);
+    await client.query(`ALTER TABLE orders ALTER COLUMN customer_email DROP NOT NULL`);
 
     const adminExists = await client.query(
       'SELECT id FROM admins WHERE username = $1',

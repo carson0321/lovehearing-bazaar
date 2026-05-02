@@ -11,6 +11,7 @@ export default function CheckoutPage() {
     customer_name: '',
     customer_email: '',
     customer_phone: '',
+    line_id: '',
     note: '',
   });
   const [errors, setErrors] = useState({});
@@ -32,11 +33,10 @@ export default function CheckoutPage() {
   function validate() {
     const errs = {};
     if (!form.customer_name.trim()) errs.customer_name = '請填寫姓名';
-    if (!form.customer_email.trim()) {
-      errs.customer_email = '請填寫 Email';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.customer_email)) {
+    if (form.customer_email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.customer_email)) {
       errs.customer_email = 'Email 格式不正確';
     }
+    if (!form.customer_phone.trim()) errs.customer_phone = '請填寫聯絡電話';
     return errs;
   }
 
@@ -105,16 +105,14 @@ export default function CheckoutPage() {
             </div>
 
             <div className="form-group">
-              <label className="form-label">
-                Email <span className="required">*</span>
-              </label>
+              <label className="form-label">Email</label>
               <input
                 className="form-input"
                 name="customer_email"
                 type="email"
                 value={form.customer_email}
                 onChange={handleChange}
-                placeholder="請輸入 Email，訂單確認通知將發送至此"
+                placeholder="選填，填寫後可收到訂單通知"
               />
               {errors.customer_email && (
                 <div className="form-error">{errors.customer_email}</div>
@@ -122,14 +120,29 @@ export default function CheckoutPage() {
             </div>
 
             <div className="form-group">
-              <label className="form-label">聯絡電話</label>
+              <label className="form-label">Line ID</label>
+              <input
+                className="form-input"
+                name="line_id"
+                value={form.line_id}
+                onChange={handleChange}
+                placeholder="選填，方便協會與您聯繫"
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">聯絡電話 <span className="required">*</span></label>
               <input
                 className="form-input"
                 name="customer_phone"
+                type="tel"
                 value={form.customer_phone}
                 onChange={handleChange}
-                placeholder="選填"
+                placeholder="請輸入聯絡電話"
               />
+              {errors.customer_phone && (
+                <div className="form-error">{errors.customer_phone}</div>
+              )}
             </div>
 
             <div className="form-group">

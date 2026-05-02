@@ -6,7 +6,7 @@ async function request(path, options = {}) {
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
   const res = await fetch(`${BASE}${path}`, { ...options, headers });
-  if (res.status === 401) {
+  if (res.status === 401 && token) {
     localStorage.removeItem('admin_token');
     localStorage.removeItem('admin_username');
     window.location.reload();
