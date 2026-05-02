@@ -15,10 +15,9 @@ export default function Footer() {
           </div>
           <div>
             <div className="footer-heading">快速連結</div>
-            <a href="https://www.lovehearing.org" target="_blank" rel="noopener noreferrer" className="footer-link">關於我們</a>
-            <a href="https://www.lovehearing.org" target="_blank" rel="noopener noreferrer" className="footer-link">活動消息</a>
-            <a href="https://www.lovehearing.org" target="_blank" rel="noopener noreferrer" className="footer-link">捐款支持</a>
-            <a href="https://www.lovehearing.org" target="_blank" rel="noopener noreferrer" className="footer-link">相關資源</a>
+            <a href="https://www.lovehearing.org/about" target="_blank" rel="noopener noreferrer" className="footer-link">關於我們</a>
+            <a href="https://www.lovehearing.org/support" target="_blank" rel="noopener noreferrer" className="footer-link">捐款支持</a>
+            <a href="https://www.lovehearing.org/aids" target="_blank" rel="noopener noreferrer" className="footer-link">相關資源</a>
           </div>
           <div>
             <div className="footer-heading">聯絡我們</div>

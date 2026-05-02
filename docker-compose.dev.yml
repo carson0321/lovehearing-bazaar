@@ -1,5 +1,3 @@
-version: '3.8'
-
 # 開發模式：程式碼變動即時生效，無需重新 build
 # 使用方式：docker compose -f docker-compose.dev.yml up
 #

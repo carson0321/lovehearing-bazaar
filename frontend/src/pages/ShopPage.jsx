@@ -34,7 +34,7 @@ export default function ShopPage() {
           都是對<span>聽損族群</span>的支持
         </h1>
         <p className="hero-desc">
-          蒲公英聽語協會義賣商品，每件商品皆由愛心志工精心製作或嚴選。
+          蒲公英聽語協會義賣商品，每件皆由善心人士捐贈與愛心志工精心嚴選。
           所有收益將全數用於支持聽損兒童的語言治療、教育服務與聽損族群的需要。
         </p>
         <div className="hero-stats">
