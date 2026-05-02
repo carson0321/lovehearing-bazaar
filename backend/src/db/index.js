@@ -10,6 +10,8 @@ async function initDB() {
   try {
     const schema = fs.readFileSync(path.join(__dirname, 'schema.sql'), 'utf8');
     await client.query(schema);
+    await client.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS image_data BYTEA`);
+    await client.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS image_mime_type VARCHAR(50)`);
 
     const adminExists = await client.query(
       'SELECT id FROM admins WHERE username = $1',

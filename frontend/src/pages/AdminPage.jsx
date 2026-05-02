@@ -114,6 +114,8 @@ function Dashboard({ username, onLogout }) {
   const [loadingOrders, setLoadingOrders] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
   const [editingId, setEditingId] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [formError, setFormError] = useState('');
   const [formSuccess, setFormSuccess] = useState('');
   const [saving, setSaving] = useState(false);
@@ -157,15 +159,22 @@ function Dashboard({ username, onLogout }) {
     };
 
     try {
+      let savedId = editingId;
       if (editingId) {
         await api.updateProduct(editingId, payload);
         setFormSuccess('商品已更新');
       } else {
-        await api.createProduct(payload);
+        const created = await api.createProduct(payload);
+        savedId = created.id;
         setFormSuccess('商品已新增');
+      }
+      if (imageFile && savedId) {
+        await api.uploadProductImage(savedId, imageFile);
       }
       setForm(EMPTY_FORM);
       setEditingId(null);
+      setImageFile(null);
+      setImagePreview(null);
       fetchProducts();
       setTimeout(() => setFormSuccess(''), 3000);
     } catch (err) {
@@ -185,7 +194,25 @@ function Dashboard({ username, onLogout }) {
       image_url: product.image_url || '',
       category: product.category || '義賣商品',
     });
+    setImageFile(null);
+    setImagePreview(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function handleImageFileChange(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+  }
+
+  async function handleClearImage(productId) {
+    try {
+      await api.deleteProductImage(productId);
+      fetchProducts();
+    } catch (err) {
+      alert(err.message || '清除失敗');
+    }
   }
 
   async function handleDelete(id, name) {
@@ -303,13 +330,53 @@ function Dashboard({ username, onLogout }) {
                   </div>
 
                   <div className="form-group full-width">
-                    <label className="form-label">商品圖片網址</label>
-                    <input
-                      className="form-input"
-                      value={form.image_url}
-                      onChange={(e) => setForm((p) => ({ ...p, image_url: e.target.value }))}
-                      placeholder="https://example.com/image.jpg"
-                    />
+                    <label className="form-label">商品圖片</label>
+                    <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                      {/* Current image preview */}
+                      {(imagePreview || (editingId && products.find(p => p.id === editingId)?.has_image)) && (
+                        <div style={{ position: 'relative', flexShrink: 0 }}>
+                          <img
+                            src={imagePreview || `/api/products/${editingId}/image`}
+                            alt="預覽"
+                            style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 8, border: '1px solid var(--border)' }}
+                          />
+                          {!imagePreview && editingId && products.find(p => p.id === editingId)?.has_image && (
+                            <button
+                              type="button"
+                              onClick={() => handleClearImage(editingId)}
+                              style={{ position: 'absolute', top: -6, right: -6, background: 'var(--error)', color: '#fff', border: 'none', borderRadius: '50%', width: 20, height: 20, cursor: 'pointer', fontSize: 11, lineHeight: '20px', padding: 0 }}
+                              title="清除圖片"
+                            >✕</button>
+                          )}
+                        </div>
+                      )}
+                      <div style={{ flex: 1, minWidth: 200 }}>
+                        <label className="btn btn-outline" style={{ cursor: 'pointer', display: 'inline-block', padding: '8px 16px', fontSize: 13 }}>
+                          {imageFile ? '重新選擇' : '上傳圖片'}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            style={{ display: 'none' }}
+                            onChange={handleImageFileChange}
+                          />
+                        </label>
+                        {imageFile && (
+                          <span style={{ marginLeft: 8, fontSize: 12, color: 'var(--text-light)' }}>
+                            {imageFile.name}
+                            <button type="button" onClick={() => { setImageFile(null); setImagePreview(null); }} style={{ marginLeft: 6, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--error)', fontSize: 12 }}>✕</button>
+                          </span>
+                        )}
+                        <div style={{ marginTop: 8 }}>
+                          <input
+                            className="form-input"
+                            value={form.image_url}
+                            onChange={(e) => setForm((p) => ({ ...p, image_url: e.target.value }))}
+                            placeholder="或貼上圖片網址 https://..."
+                            style={{ fontSize: 13 }}
+                          />
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
                   <div className="form-group full-width">
@@ -331,7 +398,7 @@ function Dashboard({ username, onLogout }) {
                     <button
                       type="button"
                       className="btn btn-outline"
-                      onClick={() => { setEditingId(null); setForm(EMPTY_FORM); setFormError(''); }}
+                      onClick={() => { setEditingId(null); setForm(EMPTY_FORM); setFormError(''); setImageFile(null); setImagePreview(null); }}
                     >
                       取消編輯
                     </button>
@@ -370,7 +437,9 @@ function Dashboard({ username, onLogout }) {
                     ) : products.map((p) => (
                       <tr key={p.id}>
                         <td>
-                          {p.image_url ? (
+                          {p.has_image ? (
+                            <img src={`/api/products/${p.id}/image`} alt={p.name} className="admin-product-img" />
+                          ) : p.image_url ? (
                             <img src={p.image_url} alt={p.name} className="admin-product-img" />
                           ) : (
                             <div className="admin-product-img" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>🎁</div>

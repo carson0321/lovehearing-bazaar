@@ -33,9 +33,9 @@ export default function CartSidebar() {
           <div className="cart-items">
             {items.map(({ product, quantity }) => (
               <div key={product.id} className="cart-item">
-                {product.image_url ? (
+                {(product.has_image || product.image_url) ? (
                   <img
-                    src={product.image_url}
+                    src={product.has_image ? `/api/products/${product.id}/image` : product.image_url}
                     alt={product.name}
                     className="cart-item-img"
                     onError={(e) => { e.target.style.display = 'none'; }}

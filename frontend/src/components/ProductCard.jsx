@@ -25,13 +25,16 @@ export default function ProductCard({ product }) {
   }
 
   const emoji = CATEGORY_EMOJI[product.category] || '🎁';
+  const imageSrc = product.has_image
+    ? `/api/products/${product.id}/image`
+    : product.image_url || null;
 
   return (
     <div className="product-card">
       <div className="product-img-wrap">
-        {product.image_url && !imgError ? (
+        {imageSrc && !imgError ? (
           <img
-            src={product.image_url}
+            src={imageSrc}
             alt={product.name}
             className="product-img"
             onError={() => setImgError(true)}
