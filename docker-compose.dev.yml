@@ -1,5 +1,11 @@
 version: '3.8'
 
+# 開發模式：程式碼變動即時生效，無需重新 build
+# 使用方式：docker compose -f docker-compose.dev.yml up
+#
+# 前端：http://localhost:3000  (Vite HMR)
+# 後端：http://localhost:3001  (nodemon)
+
 services:
   postgres:
     image: postgres:${POSTGRES_VERSION:-16}-alpine
@@ -11,6 +17,8 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-bazaar_user} -d ${POSTGRES_DB:-bazaar}"]
       interval: 5s
@@ -18,11 +26,13 @@ services:
       retries: 10
 
   backend:
-    build:
-      context: ./backend
-      args:
-        NODE_VERSION: ${NODE_VERSION:-20}
+    image: node:${NODE_VERSION:-20}-alpine
     container_name: bazaar-backend
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+      - backend_modules:/app/node_modules
+    command: sh -c "npm install && npm run dev"
     env_file: .env
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-bazaar_user}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-bazaar}
@@ -30,40 +40,31 @@ services:
       PORT: ${PORT:-3001}
       ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      NODE_ENV: development
     depends_on:
       postgres:
         condition: service_healthy
+    ports:
+      - "${PORT:-3001}:${PORT:-3001}"
     restart: unless-stopped
 
   frontend:
-    build:
-      context: ./frontend
-      args:
-        NODE_VERSION: ${NODE_VERSION:-20}
+    image: node:${NODE_VERSION:-20}-alpine
     container_name: bazaar-frontend
-    depends_on:
-      - backend
-    restart: unless-stopped
-
-  caddy:
-    image: caddy:alpine
-    container_name: bazaar-caddy
-    ports:
-      - "80:80"
-      - "443:443"
-      - "443:443/udp"
+    working_dir: /app
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy_data:/data
-      - caddy_config:/config
+      - ./frontend:/app
+      - frontend_modules:/app/node_modules
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
     environment:
-      DOMAIN: ${DOMAIN}
+      VITE_BACKEND_URL: http://backend:${PORT:-3001}
     depends_on:
-      - frontend
       - backend
+    ports:
+      - "3000:5173"
     restart: unless-stopped
 
 volumes:
   postgres_data:
-  caddy_data:
-  caddy_config:
+  backend_modules:
+  frontend_modules:
