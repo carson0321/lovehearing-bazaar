@@ -39,11 +39,11 @@ export default function ShopPage() {
         </p>
         <div className="hero-stats">
           <div className="hero-stat">
-            <div className="hero-stat-num">500+</div>
-            <div className="hero-stat-label">服務家庭</div>
+            <div className="hero-stat-num">10000+</div>
+            <div className="hero-stat-label">服務人次</div>
           </div>
           <div className="hero-stat">
-            <div className="hero-stat-num">15年</div>
+            <div className="hero-stat-num">10年+</div>
             <div className="hero-stat-label">服務經驗</div>
           </div>
           <div className="hero-stat">

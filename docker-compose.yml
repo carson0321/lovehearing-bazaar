@@ -52,8 +52,8 @@ services:
       - "443:443/udp"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy_data:/data
-      - caddy_config:/config
+      - ./caddy_data:/data
+      - ./caddy_config:/config
     environment:
       DOMAIN: ${DOMAIN}
     depends_on:
@@ -63,5 +63,3 @@ services:
 
 volumes:
   postgres_data:
-  caddy_data:
-  caddy_config:

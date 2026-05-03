@@ -16,3 +16,7 @@ npm-debug.log*
 # OS
 .DS_Store
 Thumbs.db
+
+# Caddy TLS data (certificates & keys)
+caddy_data/
+caddy_config/
