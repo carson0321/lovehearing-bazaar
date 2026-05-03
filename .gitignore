@@ -20,3 +20,6 @@ Thumbs.db
 # Caddy TLS data (certificates & keys)
 caddy_data/
 caddy_config/
+
+# PostgreSQL data
+postgres_data/
