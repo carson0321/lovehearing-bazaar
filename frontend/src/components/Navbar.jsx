@@ -12,7 +12,7 @@ export default function Navbar() {
           <img src="/logo.png" alt="蒲公英聽語協會" className="navbar-logo" />
           <div className="navbar-title">
             <span className="navbar-title-main">蒲公英聽語協會</span>
-            <span className="navbar-title-sub">Dandelion Hearing & Language</span>
+            <span className="navbar-title-sub">Dandelion Hearing & Language Association</span>
           </div>
         </Link>
 

@@ -13,6 +13,14 @@ const STATUS_LABELS = {
   cancelled: '已取消',
 };
 
+const STATUS_COLORS = {
+  pending:   { bg: '#f0f0f0', color: '#666' },
+  confirmed: { bg: '#dbeafe', color: '#1d4ed8' },
+  shipped:   { bg: '#ffedd5', color: '#c2410c' },
+  completed: { bg: '#dcfce7', color: '#15803d' },
+  cancelled: { bg: '#fee2e2', color: '#b91c1c' },
+};
+
 const CATEGORIES = ['義賣商品', '生活用品', '食品', '文具', '書籍', '手工藝品'];
 
 export default function AdminPage() {
@@ -495,8 +503,9 @@ function Dashboard({ username, onLogout }) {
                   <tr>
                     <th>訂單編號</th>
                     <th>姓名</th>
-                    <th>Email</th>
                     <th>電話</th>
+                    <th>Line ID</th>
+                    <th>Email</th>
                     <th>商品</th>
                     <th>金額</th>
                     <th>狀態</th>
@@ -506,7 +515,7 @@ function Dashboard({ username, onLogout }) {
                 <tbody>
                   {orders.length === 0 ? (
                     <tr>
-                      <td colSpan={8} style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
+                      <td colSpan={9} style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
                         尚無訂單
                       </td>
                     </tr>
@@ -516,8 +525,9 @@ function Dashboard({ username, onLogout }) {
                         {o.order_number}
                       </td>
                       <td style={{ fontWeight: 600 }}>{o.customer_name}</td>
-                      <td style={{ fontSize: 12, color: 'var(--text-light)' }}>{o.customer_email}</td>
                       <td style={{ fontSize: 12, color: 'var(--text-light)' }}>{o.customer_phone || '—'}</td>
+                      <td style={{ fontSize: 12, color: 'var(--text-light)' }}>{o.line_id || '—'}</td>
+                      <td style={{ fontSize: 12, color: 'var(--text-light)' }}>{o.customer_email || '—'}</td>
                       <td>
                         <div className="order-items-list">
                           {(o.items || []).filter(Boolean).map((item, i) => (
@@ -531,16 +541,30 @@ function Dashboard({ username, onLogout }) {
                         NT${Number(o.total_amount).toLocaleString()}
                       </td>
                       <td>
-                        <select
-                          className="form-select"
-                          style={{ fontSize: 12, padding: '5px 28px 5px 8px', width: 'auto' }}
-                          value={o.status}
-                          onChange={(e) => handleStatusChange(o.id, e.target.value)}
-                        >
-                          {Object.entries(STATUS_LABELS).map(([val, label]) => (
-                            <option key={val} value={val}>{label}</option>
-                          ))}
-                        </select>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'flex-start' }}>
+                          <span style={{
+                            display: 'inline-block',
+                            padding: '3px 10px',
+                            borderRadius: 20,
+                            fontSize: 12,
+                            fontWeight: 600,
+                            background: STATUS_COLORS[o.status]?.bg,
+                            color: STATUS_COLORS[o.status]?.color,
+                            whiteSpace: 'nowrap',
+                          }}>
+                            {STATUS_LABELS[o.status]}
+                          </span>
+                          <select
+                            className="form-select"
+                            style={{ fontSize: 11, padding: '4px 24px 4px 8px', width: 'auto' }}
+                            value={o.status}
+                            onChange={(e) => handleStatusChange(o.id, e.target.value)}
+                          >
+                            {Object.entries(STATUS_LABELS).map(([val, label]) => (
+                              <option key={val} value={val}>{label}</option>
+                            ))}
+                          </select>
+                        </div>
                       </td>
                       <td style={{ fontSize: 12, color: 'var(--text-light)', whiteSpace: 'nowrap' }}>
                         {new Date(o.created_at).toLocaleString('zh-TW', {

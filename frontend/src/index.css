@@ -1489,6 +1489,27 @@ select {
   color: var(--primary);
 }
 
+.footer-social-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  color: #fff;
+  transition: transform 0.2s, box-shadow 0.2s;
+  flex-shrink: 0;
+}
+
+.footer-social-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.footer-social-btn.fb   { background: #1877F2; }
+.footer-social-btn.ig   { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+.footer-social-btn.yt   { background: #FF0000; }
+
 .footer-bottom {
   padding-top: 20px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);

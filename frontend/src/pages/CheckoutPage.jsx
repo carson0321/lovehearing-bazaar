@@ -89,9 +89,7 @@ export default function CheckoutPage() {
 
           <form onSubmit={handleSubmit}>
             <div className="form-group">
-              <label className="form-label">
-                姓名 <span className="required">*</span>
-              </label>
+              <label className="form-label">姓名 <span className="required">*</span></label>
               <input
                 className="form-input"
                 name="customer_name"
@@ -105,17 +103,17 @@ export default function CheckoutPage() {
             </div>
 
             <div className="form-group">
-              <label className="form-label">Email</label>
+              <label className="form-label">聯絡電話 <span className="required">*</span></label>
               <input
                 className="form-input"
-                name="customer_email"
-                type="email"
-                value={form.customer_email}
+                name="customer_phone"
+                type="tel"
+                value={form.customer_phone}
                 onChange={handleChange}
-                placeholder="選填，填寫後可收到訂單通知"
+                placeholder="請輸入聯絡電話"
               />
-              {errors.customer_email && (
-                <div className="form-error">{errors.customer_email}</div>
+              {errors.customer_phone && (
+                <div className="form-error">{errors.customer_phone}</div>
               )}
             </div>
 
@@ -131,17 +129,17 @@ export default function CheckoutPage() {
             </div>
 
             <div className="form-group">
-              <label className="form-label">聯絡電話 <span className="required">*</span></label>
+              <label className="form-label">Email</label>
               <input
                 className="form-input"
-                name="customer_phone"
-                type="tel"
-                value={form.customer_phone}
+                name="customer_email"
+                type="email"
+                value={form.customer_email}
                 onChange={handleChange}
-                placeholder="請輸入聯絡電話"
+                placeholder="選填，方便協會與您聯繫"
               />
-              {errors.customer_phone && (
-                <div className="form-error">{errors.customer_phone}</div>
+              {errors.customer_email && (
+                <div className="form-error">{errors.customer_email}</div>
               )}
             </div>
 
