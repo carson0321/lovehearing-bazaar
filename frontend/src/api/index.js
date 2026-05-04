@@ -24,11 +24,11 @@ export const api = {
   createProduct: (body) => request('/products', { method: 'POST', body: JSON.stringify(body) }),
   updateProduct: (id, body) => request(`/products/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
   deleteProduct: (id) => request(`/products/${id}`, { method: 'DELETE' }),
-  uploadProductImage: (id, file) => {
+  uploadProductImage: (productId, file) => {
     const token = localStorage.getItem('admin_token');
     const formData = new FormData();
     formData.append('image', file);
-    return fetch(`/api/products/${id}/image`, {
+    return fetch(`/api/products/${productId}/images`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
       body: formData,
@@ -38,7 +38,7 @@ export const api = {
       return data;
     });
   },
-  deleteProductImage: (id) => request(`/products/${id}/image`, { method: 'DELETE' }),
+  deleteProductImage: (imageId) => request(`/products/images/${imageId}`, { method: 'DELETE' }),
 
   // Orders
   createOrder: (body) => request('/orders', { method: 'POST', body: JSON.stringify(body) }),

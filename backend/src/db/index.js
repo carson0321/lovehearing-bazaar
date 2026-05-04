@@ -15,6 +15,33 @@ async function initDB() {
     await client.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS line_id VARCHAR(100)`);
     await client.query(`ALTER TABLE orders ALTER COLUMN customer_email DROP NOT NULL`);
 
+    // Migration 001: 商品多圖支援
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS product_images (
+        id              SERIAL PRIMARY KEY,
+        product_id      INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+        image_data      BYTEA NOT NULL,
+        image_mime_type VARCHAR(50) NOT NULL DEFAULT 'image/jpeg',
+        sort_order      SMALLINT NOT NULL DEFAULT 0,
+        created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `);
+    await client.query(`CREATE INDEX IF NOT EXISTS idx_product_images_product_id ON product_images(product_id)`);
+
+    // 將舊的單張圖片欄位遷移至 product_images（若欄位仍存在）
+    const colCheck = await client.query(
+      `SELECT 1 FROM information_schema.columns WHERE table_name='products' AND column_name='image_data'`
+    );
+    if (colCheck.rows.length > 0) {
+      await client.query(`
+        INSERT INTO product_images (product_id, image_data, image_mime_type, sort_order)
+        SELECT id, image_data, COALESCE(image_mime_type, 'image/jpeg'), 0
+        FROM products WHERE image_data IS NOT NULL
+      `);
+      await client.query(`ALTER TABLE products DROP COLUMN image_data`);
+      await client.query(`ALTER TABLE products DROP COLUMN IF EXISTS image_mime_type`);
+    }
+
     const adminExists = await client.query(
       'SELECT id FROM admins WHERE username = $1',
       [process.env.ADMIN_USERNAME || 'admin']

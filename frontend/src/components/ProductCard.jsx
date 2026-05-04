@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCart } from '../context/CartContext';
+import ImageCarousel from './ImageCarousel';
 
 const CATEGORY_EMOJI = {
   '生活用品': '🏠',
@@ -13,7 +14,6 @@ const CATEGORY_EMOJI = {
 export default function ProductCard({ product }) {
   const { addItem } = useCart();
   const [added, setAdded] = useState(false);
-  const [imgError, setImgError] = useState(false);
 
   const isOutOfStock = product.stock <= 0;
 
@@ -25,20 +25,16 @@ export default function ProductCard({ product }) {
   }
 
   const emoji = CATEGORY_EMOJI[product.category] || '🎁';
-  const imageSrc = product.has_image
-    ? `/api/products/${product.id}/image`
-    : product.image_url || null;
+  const images = [
+    ...(product.image_ids || []).map((id) => `/api/products/images/${id}`),
+    ...(product.image_url ? [product.image_url] : []),
+  ];
 
   return (
     <div className="product-card">
       <div className="product-img-wrap">
-        {imageSrc && !imgError ? (
-          <img
-            src={imageSrc}
-            alt={product.name}
-            className="product-img"
-            onError={() => setImgError(true)}
-          />
+        {images.length > 0 ? (
+          <ImageCarousel images={images} alt={product.name} className="product-img" />
         ) : (
           <div className="product-img-placeholder">{emoji}</div>
         )}
