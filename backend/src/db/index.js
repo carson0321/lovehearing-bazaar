@@ -15,6 +15,10 @@ async function initDB() {
     await client.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS line_id VARCHAR(100)`);
     await client.query(`ALTER TABLE orders ALTER COLUMN customer_email DROP NOT NULL`);
 
+    // Migration 002: 訂單運送方式 + 匯款帳號後五碼
+    await client.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS shipping_method VARCHAR(20) NOT NULL DEFAULT 'pickup'`);
+    await client.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS transfer_last5 CHAR(5)`);
+
     // Migration 001: 商品多圖支援
     await client.query(`
       CREATE TABLE IF NOT EXISTS product_images (

@@ -3,6 +3,12 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { api } from '../api';
 
+const SHIPPING_OPTIONS = [
+  { value: '711',      label: '7-11 店到店',  fee: 80,  note: '運費 NT$80' },
+  { value: 'delivery', label: '宅配地址',      fee: 100, note: '包裹郵資 NT$100' },
+  { value: 'pickup',   label: '自取',          fee: 0,   note: '臺北市中山區長安東路一段65巷3號3樓' },
+];
+
 export default function CheckoutPage() {
   const { items, totalAmount, clearCart } = useCart();
   const navigate = useNavigate();
@@ -13,10 +19,16 @@ export default function CheckoutPage() {
     customer_phone: '',
     line_id: '',
     note: '',
+    shipping_method: '',
+    transfer_last5: '',
   });
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
+
+  const selectedShipping = SHIPPING_OPTIONS.find((o) => o.value === form.shipping_method);
+  const shippingFee = selectedShipping?.fee ?? 0;
+  const grandTotal = totalAmount + shippingFee;
 
   if (items.length === 0) {
     return (
@@ -33,10 +45,18 @@ export default function CheckoutPage() {
   function validate() {
     const errs = {};
     if (!form.customer_name.trim()) errs.customer_name = '請填寫姓名';
-    if (form.customer_email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.customer_email)) {
+    if (!form.customer_phone.trim()) errs.customer_phone = '請填寫聯絡電話';
+    if (!form.customer_email.trim()) {
+      errs.customer_email = '請填寫 Email';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.customer_email)) {
       errs.customer_email = 'Email 格式不正確';
     }
-    if (!form.customer_phone.trim()) errs.customer_phone = '請填寫聯絡電話';
+    if (!form.shipping_method) errs.shipping_method = '請選擇運送方式';
+    if (!form.transfer_last5.trim()) {
+      errs.transfer_last5 = '請填寫匯款帳號後五碼';
+    } else if (!/^\d{5}$/.test(form.transfer_last5)) {
+      errs.transfer_last5 = '須為5位數字';
+    }
     return errs;
   }
 
@@ -97,9 +117,7 @@ export default function CheckoutPage() {
                 onChange={handleChange}
                 placeholder="請輸入您的姓名"
               />
-              {errors.customer_name && (
-                <div className="form-error">{errors.customer_name}</div>
-              )}
+              {errors.customer_name && <div className="form-error">{errors.customer_name}</div>}
             </div>
 
             <div className="form-group">
@@ -112,9 +130,20 @@ export default function CheckoutPage() {
                 onChange={handleChange}
                 placeholder="請輸入聯絡電話"
               />
-              {errors.customer_phone && (
-                <div className="form-error">{errors.customer_phone}</div>
-              )}
+              {errors.customer_phone && <div className="form-error">{errors.customer_phone}</div>}
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Email <span className="required">*</span></label>
+              <input
+                className="form-input"
+                name="customer_email"
+                type="email"
+                value={form.customer_email}
+                onChange={handleChange}
+                placeholder="請輸入 Email"
+              />
+              {errors.customer_email && <div className="form-error">{errors.customer_email}</div>}
             </div>
 
             <div className="form-group">
@@ -129,18 +158,65 @@ export default function CheckoutPage() {
             </div>
 
             <div className="form-group">
-              <label className="form-label">Email</label>
+              <label className="form-label">運送方式 <span className="required">*</span></label>
+              <div className="shipping-options">
+                {SHIPPING_OPTIONS.map((opt) => (
+                  <label
+                    key={opt.value}
+                    className={`shipping-option ${form.shipping_method === opt.value ? 'selected' : ''}`}
+                  >
+                    <input
+                      type="radio"
+                      name="shipping_method"
+                      value={opt.value}
+                      checked={form.shipping_method === opt.value}
+                      onChange={handleChange}
+                      style={{ display: 'none' }}
+                    />
+                    <div className="shipping-option-main">
+                      <span className="shipping-option-label">{opt.label}</span>
+                      <span className="shipping-option-fee">
+                        {opt.fee === 0 ? '免運費' : `NT$${opt.fee}`}
+                      </span>
+                    </div>
+                    <div className="shipping-option-note">{opt.note}</div>
+                  </label>
+                ))}
+              </div>
+              {errors.shipping_method && <div className="form-error">{errors.shipping_method}</div>}
+            </div>
+
+            <div className="bank-info-box">
+              <div className="bank-info-title">💳 匯款資訊</div>
+              <div className="bank-info-row">
+                <span>銀行</span>
+                <span>合作金庫銀行（006）長安分行</span>
+              </div>
+              <div className="bank-info-row">
+                <span>帳號</span>
+                <strong>0888717136030</strong>
+              </div>
+              <div style={{ fontSize: 12, color: 'var(--text-light)', marginTop: 6 }}>
+                請先完成匯款後再填寫帳號後五碼送出訂單
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">匯款帳號後五碼 <span className="required">*</span></label>
               <input
                 className="form-input"
-                name="customer_email"
-                type="email"
-                value={form.customer_email}
-                onChange={handleChange}
-                placeholder="選填，方便協會與您聯繫"
+                name="transfer_last5"
+                value={form.transfer_last5}
+                onChange={(e) => {
+                  const v = e.target.value.replace(/\D/g, '').slice(0, 5);
+                  setForm((p) => ({ ...p, transfer_last5: v }));
+                  if (errors.transfer_last5) setErrors((p) => ({ ...p, transfer_last5: '' }));
+                }}
+                placeholder="請輸入匯款帳號後五碼"
+                inputMode="numeric"
+                maxLength={5}
               />
-              {errors.customer_email && (
-                <div className="form-error">{errors.customer_email}</div>
-              )}
+              {errors.transfer_last5 && <div className="form-error">{errors.transfer_last5}</div>}
             </div>
 
             <div className="form-group">
@@ -186,10 +262,21 @@ export default function CheckoutPage() {
             </div>
           ))}
 
+          <div style={{ borderTop: '1px solid var(--border-light)', margin: '12px 0' }} />
+
+          <div className="order-item-row" style={{ fontSize: 13, color: 'var(--text-light)' }}>
+            <span>商品小計</span>
+            <span>NT${totalAmount.toLocaleString()}</span>
+          </div>
+          <div className="order-item-row" style={{ fontSize: 13, color: 'var(--text-light)' }}>
+            <span>運費{selectedShipping ? `（${selectedShipping.label}）` : ''}</span>
+            <span>{selectedShipping ? (shippingFee === 0 ? '免運費' : `NT$${shippingFee}`) : '—'}</span>
+          </div>
+
           <div className="order-total-row">
             <span className="order-total-label">總計</span>
             <span className="order-total-amount">
-              NT${totalAmount.toLocaleString()}
+              NT${grandTotal.toLocaleString()}
             </span>
           </div>
 
@@ -199,17 +286,16 @@ export default function CheckoutPage() {
             disabled={submitting}
           >
             {submitting ? (
-              <>
-                <span className="spinner" />
-                <span>處理中...</span>
-              </>
+              <><span className="spinner" /><span>處理中...</span></>
             ) : (
               '確認下單 ✓'
             )}
           </button>
 
-          <div style={{ marginTop: 12, fontSize: 12, color: 'var(--text-muted)', textAlign: 'center' }}>
-            下單後請等候協會聯繫付款方式
+          <div style={{ marginTop: 12, fontSize: 12, color: 'var(--text-light)', textAlign: 'center', lineHeight: 1.7 }}>
+            下單匯款後請聯繫協會<br />
+            合作金庫銀行(006) 長安分行<br />
+            <strong style={{ letterSpacing: 1 }}>0888717136030</strong>
           </div>
         </div>
       </div>
@@ -218,7 +304,7 @@ export default function CheckoutPage() {
       <div className="checkout-mobile-bar">
         <div className="checkout-mobile-bar-total">
           <div className="checkout-mobile-bar-label">訂單合計</div>
-          <div className="checkout-mobile-bar-amount">NT${totalAmount.toLocaleString()}</div>
+          <div className="checkout-mobile-bar-amount">NT${grandTotal.toLocaleString()}</div>
         </div>
         <button
           className="checkout-mobile-bar-btn"

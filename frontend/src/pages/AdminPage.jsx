@@ -516,8 +516,10 @@ function Dashboard({ username, onLogout }) {
                     <th>訂單編號</th>
                     <th>姓名</th>
                     <th>電話</th>
-                    <th>Line ID</th>
                     <th>Email</th>
+                    <th>Line ID</th>
+                    <th>運送方式</th>
+                    <th>匯款後五碼</th>
                     <th>商品</th>
                     <th>金額</th>
                     <th>狀態</th>
@@ -527,7 +529,7 @@ function Dashboard({ username, onLogout }) {
                 <tbody>
                   {orders.length === 0 ? (
                     <tr>
-                      <td colSpan={9} style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
+                      <td colSpan={11} style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
                         尚無訂單
                       </td>
                     </tr>
@@ -538,8 +540,17 @@ function Dashboard({ username, onLogout }) {
                       </td>
                       <td style={{ fontWeight: 600 }}>{o.customer_name}</td>
                       <td style={{ fontSize: 12, color: 'var(--text-light)' }}>{o.customer_phone || '—'}</td>
-                      <td style={{ fontSize: 12, color: 'var(--text-light)' }}>{o.line_id || '—'}</td>
                       <td style={{ fontSize: 12, color: 'var(--text-light)' }}>{o.customer_email || '—'}</td>
+                      <td style={{ fontSize: 12, color: 'var(--text-light)' }}>{o.line_id || '—'}</td>
+                      <td style={{ fontSize: 12, whiteSpace: 'nowrap' }}>
+                        {o.shipping_method === '711' && '7-11店到店'}
+                        {o.shipping_method === 'delivery' && '宅配地址'}
+                        {o.shipping_method === 'pickup' && '自取'}
+                        {!o.shipping_method && '—'}
+                      </td>
+                      <td style={{ fontSize: 13, fontFamily: 'monospace', letterSpacing: 1 }}>
+                        {o.transfer_last5 || '—'}
+                      </td>
                       <td>
                         <div className="order-items-list">
                           {(o.items || []).filter(Boolean).map((item, i) => (

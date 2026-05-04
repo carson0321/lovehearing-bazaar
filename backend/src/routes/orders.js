@@ -4,11 +4,19 @@ const authMiddleware = require('../middleware/auth');
 
 const router = express.Router();
 
-router.post('/', async (req, res) => {
-  const { customer_name, customer_email, customer_phone, line_id, note, items } = req.body;
+const SHIPPING_FEES = { '711': 80, delivery: 100, pickup: 0 };
 
-  if (!customer_name || !customer_phone || !items || items.length === 0) {
-    return res.status(400).json({ error: '請填寫姓名、聯絡電話，並選擇至少一件商品' });
+router.post('/', async (req, res) => {
+  const { customer_name, customer_email, customer_phone, line_id, note, shipping_method, transfer_last5, items } = req.body;
+
+  if (!customer_name || !customer_email || !customer_phone || !shipping_method || !transfer_last5 || !items || items.length === 0) {
+    return res.status(400).json({ error: '請填寫所有必填欄位並選擇至少一件商品' });
+  }
+  if (!SHIPPING_FEES.hasOwnProperty(shipping_method)) {
+    return res.status(400).json({ error: '無效的運送方式' });
+  }
+  if (!/^\d{5}$/.test(transfer_last5)) {
+    return res.status(400).json({ error: '匯款帳號後五碼須為5位數字' });
   }
 
   const client = await pool.connect();
@@ -41,11 +49,14 @@ router.post('/', async (req, res) => {
       ]);
     }
 
+    const shippingFee = SHIPPING_FEES[shipping_method];
+    const grandTotal = total + shippingFee;
+
     const orderNumber = 'ORD-' + Date.now().toString().slice(-8);
     const orderResult = await client.query(
-      `INSERT INTO orders (order_number, customer_name, customer_email, customer_phone, line_id, note, total_amount)
-       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-      [orderNumber, customer_name, customer_email || '', customer_phone, line_id || '', note || '', total]
+      `INSERT INTO orders (order_number, customer_name, customer_email, customer_phone, line_id, note, shipping_method, transfer_last5, total_amount)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
+      [orderNumber, customer_name, customer_email, customer_phone, line_id || '', note || '', shipping_method, transfer_last5, grandTotal]
     );
     const order = orderResult.rows[0];
 
@@ -58,7 +69,7 @@ router.post('/', async (req, res) => {
     }
 
     await client.query('COMMIT');
-    res.status(201).json({ order_number: order.order_number, total_amount: total });
+    res.status(201).json({ order_number: order.order_number, total_amount: grandTotal, shipping_fee: shippingFee });
   } catch (err) {
     await client.query('ROLLBACK');
     console.error(err);
