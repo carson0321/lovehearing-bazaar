@@ -45,6 +45,9 @@ export const api = {
   getOrders: () => request('/orders'),
   updateOrderStatus: (id, status) =>
     request(`/orders/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
+  lookupOrders: (body) => request('/orders/transfer/lookup', { method: 'POST', body: JSON.stringify(body) }),
+  reportTransfer: (body) => request('/orders/transfer', { method: 'POST', body: JSON.stringify(body) }),
+  getTransfers: () => request('/orders/transfers'),
 
   // Auth
   login: (username, password) =>

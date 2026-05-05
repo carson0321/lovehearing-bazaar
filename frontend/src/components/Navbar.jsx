@@ -20,6 +20,9 @@ export default function Navbar() {
           <Link to="/" className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}>
             義賣商品
           </Link>
+          <Link to="/transfer" className={`nav-link ${location.pathname === '/transfer' ? 'active' : ''}`}>
+            匯款回報
+          </Link>
           <a
             href="https://www.lovehearing.org"
             target="_blank"
@@ -31,6 +34,9 @@ export default function Navbar() {
         </div>
 
         <div className="navbar-actions">
+          <Link to="/transfer" className="transfer-mobile-btn">
+            💳 匯款回報
+          </Link>
           <button className="cart-btn" onClick={() => setIsOpen(true)}>
             <span>🛒</span>
             <span>購物車</span>

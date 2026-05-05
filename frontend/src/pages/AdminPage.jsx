@@ -118,8 +118,10 @@ function Dashboard({ username, onLogout }) {
   const [tab, setTab] = useState('products');
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [transfers, setTransfers] = useState([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
   const [loadingOrders, setLoadingOrders] = useState(false);
+  const [loadingTransfers, setLoadingTransfers] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
   const [editingId, setEditingId] = useState(null);
   const [newImageFiles, setNewImageFiles] = useState([]); // [{file, preview}]
@@ -145,9 +147,18 @@ function Dashboard({ username, onLogout }) {
 
   useEffect(() => { fetchProducts(); }, [fetchProducts]);
 
+  const fetchTransfers = useCallback(() => {
+    setLoadingTransfers(true);
+    api.getTransfers()
+      .then(setTransfers)
+      .catch(() => {})
+      .finally(() => setLoadingTransfers(false));
+  }, []);
+
   useEffect(() => {
     if (tab === 'orders') fetchOrders();
-  }, [tab, fetchOrders]);
+    if (tab === 'transfers') fetchTransfers();
+  }, [tab, fetchOrders, fetchTransfers]);
 
   async function handleSaveProduct(e) {
     e.preventDefault();
@@ -244,7 +255,8 @@ function Dashboard({ username, onLogout }) {
   async function handleStatusChange(orderId, status) {
     try {
       await api.updateOrderStatus(orderId, status);
-      fetchOrders();
+      if (tab === 'transfers') fetchTransfers();
+      else fetchOrders();
     } catch {}
   }
 
@@ -274,6 +286,12 @@ function Dashboard({ username, onLogout }) {
             onClick={() => setTab('orders')}
           >
             訂單管理
+          </button>
+          <button
+            className={`admin-tab ${tab === 'transfers' ? 'active' : ''}`}
+            onClick={() => setTab('transfers')}
+          >
+            匯款管理
           </button>
         </div>
 
@@ -571,6 +589,103 @@ function Dashboard({ username, onLogout }) {
                             borderRadius: 20,
                             fontSize: 12,
                             fontWeight: 600,
+                            background: STATUS_COLORS[o.status]?.bg,
+                            color: STATUS_COLORS[o.status]?.color,
+                            whiteSpace: 'nowrap',
+                          }}>
+                            {STATUS_LABELS[o.status]}
+                          </span>
+                          <select
+                            className="form-select"
+                            style={{ fontSize: 11, padding: '4px 24px 4px 8px', width: 'auto' }}
+                            value={o.status}
+                            onChange={(e) => handleStatusChange(o.id, e.target.value)}
+                          >
+                            {Object.entries(STATUS_LABELS).map(([val, label]) => (
+                              <option key={val} value={val}>{label}</option>
+                            ))}
+                          </select>
+                        </div>
+                      </td>
+                      <td style={{ fontSize: 12, color: 'var(--text-light)', whiteSpace: 'nowrap' }}>
+                        {new Date(o.created_at).toLocaleString('zh-TW', {
+                          month: '2-digit', day: '2-digit',
+                          hour: '2-digit', minute: '2-digit',
+                        })}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        )}
+
+        {tab === 'transfers' && (
+          <div className="admin-table-wrap">
+            {loadingTransfers ? (
+              <div style={{ padding: '48px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                <div className="spinner dark" style={{ margin: '0 auto 12px' }} />
+                載入中...
+              </div>
+            ) : (
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>訂單編號</th>
+                    <th>姓名</th>
+                    <th>電話</th>
+                    <th>Email</th>
+                    <th>匯款後五碼</th>
+                    <th>金額</th>
+                    <th>運送方式</th>
+                    <th>狀態</th>
+                    <th>下單時間</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {transfers.length === 0 ? (
+                    <tr>
+                      <td colSpan={9} style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
+                        尚無匯款回報紀錄
+                      </td>
+                    </tr>
+                  ) : transfers.map((o) => (
+                    <tr key={o.id}>
+                      <td style={{ fontWeight: 700, color: 'var(--primary-dark)', fontSize: 12 }}>
+                        {o.order_number}
+                      </td>
+                      <td style={{ fontWeight: 600 }}>{o.customer_name}</td>
+                      <td style={{ fontSize: 12, color: 'var(--text-light)' }}>{o.customer_phone}</td>
+                      <td style={{ fontSize: 12, color: 'var(--text-light)' }}>{o.customer_email}</td>
+                      <td>
+                        <span style={{
+                          display: 'inline-block',
+                          padding: '3px 12px',
+                          background: '#dbeafe',
+                          color: '#1d4ed8',
+                          borderRadius: 20,
+                          fontFamily: 'monospace',
+                          fontWeight: 700,
+                          fontSize: 14,
+                          letterSpacing: 2,
+                        }}>
+                          {o.transfer_last5}
+                        </span>
+                      </td>
+                      <td style={{ fontWeight: 700, color: 'var(--primary-dark)', whiteSpace: 'nowrap' }}>
+                        NT${Number(o.total_amount).toLocaleString()}
+                      </td>
+                      <td style={{ fontSize: 12, whiteSpace: 'nowrap' }}>
+                        {o.shipping_method === '711' && '7-11店到店'}
+                        {o.shipping_method === 'delivery' && '宅配地址'}
+                        {o.shipping_method === 'pickup' && '自取'}
+                      </td>
+                      <td>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'flex-start' }}>
+                          <span style={{
+                            display: 'inline-block', padding: '3px 10px', borderRadius: 20,
+                            fontSize: 12, fontWeight: 600,
                             background: STATUS_COLORS[o.status]?.bg,
                             color: STATUS_COLORS[o.status]?.color,
                             whiteSpace: 'nowrap',

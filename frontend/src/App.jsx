@@ -6,6 +6,7 @@ import Footer from './components/Footer';
 import ShopPage from './pages/ShopPage';
 import CheckoutPage from './pages/CheckoutPage';
 import OrderSuccessPage from './pages/OrderSuccessPage';
+import TransferPage from './pages/TransferPage';
 import AdminPage from './pages/AdminPage';
 
 export default function App() {
@@ -26,6 +27,7 @@ export default function App() {
                       <Route path="/" element={<ShopPage />} />
                       <Route path="/checkout" element={<CheckoutPage />} />
                       <Route path="/order-success" element={<OrderSuccessPage />} />
+                      <Route path="/transfer" element={<TransferPage />} />
                     </Routes>
                   </main>
                   <Footer />

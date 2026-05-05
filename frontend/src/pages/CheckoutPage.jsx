@@ -20,7 +20,6 @@ export default function CheckoutPage() {
     line_id: '',
     note: '',
     shipping_method: '',
-    transfer_last5: '',
   });
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
@@ -52,11 +51,6 @@ export default function CheckoutPage() {
       errs.customer_email = 'Email 格式不正確';
     }
     if (!form.shipping_method) errs.shipping_method = '請選擇運送方式';
-    if (!form.transfer_last5.trim()) {
-      errs.transfer_last5 = '請填寫匯款帳號後五碼';
-    } else if (!/^\d{5}$/.test(form.transfer_last5)) {
-      errs.transfer_last5 = '須為5位數字';
-    }
     return errs;
   }
 
@@ -197,26 +191,8 @@ export default function CheckoutPage() {
                 <strong>0888717136030</strong>
               </div>
               <div style={{ fontSize: 12, color: 'var(--text-light)', marginTop: 6 }}>
-                請先完成匯款後再填寫帳號後五碼送出訂單
+                下單後請完成匯款，再至「匯款回報」頁面填寫帳號後五碼
               </div>
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">匯款帳號後五碼 <span className="required">*</span></label>
-              <input
-                className="form-input"
-                name="transfer_last5"
-                value={form.transfer_last5}
-                onChange={(e) => {
-                  const v = e.target.value.replace(/\D/g, '').slice(0, 5);
-                  setForm((p) => ({ ...p, transfer_last5: v }));
-                  if (errors.transfer_last5) setErrors((p) => ({ ...p, transfer_last5: '' }));
-                }}
-                placeholder="請輸入匯款帳號後五碼"
-                inputMode="numeric"
-                maxLength={5}
-              />
-              {errors.transfer_last5 && <div className="form-error">{errors.transfer_last5}</div>}
             </div>
 
             <div className="form-group">
@@ -296,9 +272,7 @@ export default function CheckoutPage() {
           </button>
 
           <div style={{ marginTop: 12, fontSize: 12, color: 'var(--text-light)', textAlign: 'center', lineHeight: 1.7 }}>
-            下單匯款後請聯繫協會<br />
-            合作金庫銀行(006) 長安分行<br />
-            <strong style={{ letterSpacing: 1 }}>0888717136030</strong>
+            下單後請至「匯款回報」頁面填寫帳號後五碼
           </div>
         </div>
       </div>
