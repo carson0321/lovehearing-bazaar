@@ -101,7 +101,7 @@ router.get('/', authMiddleware, async (req, res) => {
 router.patch('/:id/status', authMiddleware, async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
-  const validStatuses = ['pending', 'confirmed', 'shipped', 'completed', 'cancelled'];
+  const validStatuses = ['pending', 'confirmed', 'shipped', 'completed', 'cancelled', 'expired'];
   if (!validStatuses.includes(status)) {
     return res.status(400).json({ error: '無效的訂單狀態' });
   }

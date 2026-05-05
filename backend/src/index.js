@@ -4,6 +4,7 @@ const { initDB } = require('./db');
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/products');
 const orderRoutes = require('./routes/orders');
+const { startExpireJob } = require('./jobs/expireOrders');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -28,6 +29,8 @@ async function start() {
       await new Promise((r) => setTimeout(r, 2000));
     }
   }
+
+  startExpireJob();
 
   app.listen(PORT, () => {
     console.log(`🌼 蒲公英義賣後端服務啟動於 port ${PORT}`);

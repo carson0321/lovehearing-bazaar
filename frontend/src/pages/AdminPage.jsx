@@ -11,6 +11,7 @@ const STATUS_LABELS = {
   shipped: '已出貨',
   completed: '已完成',
   cancelled: '已取消',
+  expired: '已逾時',
 };
 
 const STATUS_COLORS = {
@@ -19,6 +20,7 @@ const STATUS_COLORS = {
   shipped:   { bg: '#ffedd5', color: '#c2410c' },
   completed: { bg: '#dcfce7', color: '#15803d' },
   cancelled: { bg: '#fee2e2', color: '#b91c1c' },
+  expired:   { bg: '#f3e8ff', color: '#7e22ce' },
 };
 
 const CATEGORIES = ['義賣商品', '生活用品', '食品', '文具', '書籍', '手工藝品'];
