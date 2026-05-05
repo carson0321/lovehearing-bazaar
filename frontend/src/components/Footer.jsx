@@ -38,6 +38,9 @@ export default function Footer() {
         </div>
         <div className="footer-bottom">
           © {new Date().getFullYear()} 蒲公英聽語協會 版權所有｜本網站義賣所得全數用於聽損族群服務
+          <div style={{ marginTop: 6, fontSize: 12, opacity: 0.75 }}>
+            公益勸募許可字號 115年02月09日北市社團字第115030052號
+          </div>
         </div>
       </div>
     </footer>

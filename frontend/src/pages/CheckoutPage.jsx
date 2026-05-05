@@ -242,6 +242,9 @@ export default function CheckoutPage() {
               }}
             >
               💛 義賣所得將全數捐助蒲公英聽語協會，支持聽損兒童的語言治療、教育服務與聽損族群的需要。感謝您的愛心！
+              <div style={{ marginTop: 8, fontSize: 12, color: 'var(--text-muted)' }}>
+                公益勸募許可字號 115年02月09日北市社團字第115030052號
+              </div>
             </div>
           </form>
         </div>
