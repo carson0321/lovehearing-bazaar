@@ -578,95 +578,76 @@ function Dashboard({ username, onLogout }) {
 
         {tab === 'orders' && (
           <>
-          {orders.length > 0 && (
-            <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '12px 0 0' }}>
-              <button className="btn btn-outline" style={{ fontSize: 13, padding: '7px 16px' }} onClick={() => exportOrders(orders)}>
-                匯出 Excel
-              </button>
-            </div>
-          )}
-          <div className="admin-table-wrap">
-            {loadingOrders ? (
-              <div style={{ padding: '48px', textAlign: 'center', color: 'var(--text-muted)' }}>
-                <div className="spinner dark" style={{ margin: '0 auto 12px' }} />
-                載入中...
+            {orders.length > 0 && (
+              <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '12px 0 0' }}>
+                <button className="btn btn-outline" style={{ fontSize: 13, padding: '7px 16px' }} onClick={() => exportOrders(orders)}>
+                  匯出 Excel
+                </button>
               </div>
-            ) : (
-              <table className="admin-table">
-                <thead>
-                  <tr>
-                    <th>訂單編號</th>
-                    <th>姓名</th>
-                    <th>電話</th>
-                    <th>Email</th>
-                    <th>Line ID</th>
-                    <th>運送方式</th>
-                    <th>匯款後五碼</th>
-                    <th>商品</th>
-                    <th>備註</th>
-                    <th>金額</th>
-                    <th>狀態</th>
-                    <th>下單時間</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {orders.length === 0 ? (
+            )}
+            <div className="admin-table-wrap">
+              {loadingOrders ? (
+                <div style={{ padding: '48px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                  <div className="spinner dark" style={{ margin: '0 auto 12px' }} />載入中...
+                </div>
+              ) : (
+                <table className="admin-table">
+                  <thead>
                     <tr>
-                      <td colSpan={13} style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
-                        尚無訂單
-                      </td>
+                      <th>訂單 / 時間</th>
+                      <th>顧客</th>
+                      <th>配送 / 匯款</th>
+                      <th>商品 / 備註</th>
+                      <th>金額</th>
+                      <th>狀態</th>
+                      <th></th>
                     </tr>
-                  ) : orders.map((o) => (
-                    <tr key={o.id}>
-                      <td style={{ fontWeight: 700, color: 'var(--primary-dark)', fontSize: 12 }}>
-                        {o.order_number}
-                      </td>
-                      <td style={{ fontWeight: 600 }}>{o.customer_name}</td>
-                      <td style={{ fontSize: 12, color: 'var(--text-light)' }}>{o.customer_phone || '—'}</td>
-                      <td style={{ fontSize: 12, color: 'var(--text-light)' }}>{o.customer_email || '—'}</td>
-                      <td style={{ fontSize: 12, color: 'var(--text-light)' }}>{o.line_id || '—'}</td>
-                      <td style={{ fontSize: 12, whiteSpace: 'nowrap' }}>
-                        {o.shipping_method === '711' && '7-11店到店'}
-                        {o.shipping_method === 'delivery' && '宅配地址'}
-                        {o.shipping_method === 'pickup' && '自取'}
-                        {!o.shipping_method && '—'}
-                      </td>
-                      <td style={{ fontSize: 13, fontFamily: 'monospace', letterSpacing: 1 }}>
-                        {o.transfer_last5 || '—'}
-                      </td>
-                      <td>
-                        <div className="order-items-list">
-                          {(o.items || []).filter(Boolean).map((item, i) => (
-                            <div key={i}>
-                              {item.product_name} ×{item.quantity}
-                            </div>
-                          ))}
-                        </div>
-                      </td>
-                      <td style={{ fontSize: 12, color: 'var(--text-light)', maxWidth: 160, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-                        {o.note || '—'}
-                      </td>
-                      <td style={{ fontWeight: 700, color: 'var(--primary-dark)', whiteSpace: 'nowrap' }}>
-                        NT${Number(o.total_amount).toLocaleString()}
-                      </td>
-                      <td>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'flex-start' }}>
-                          <span style={{
-                            display: 'inline-block',
-                            padding: '3px 10px',
-                            borderRadius: 20,
-                            fontSize: 12,
-                            fontWeight: 600,
-                            background: STATUS_COLORS[o.status]?.bg,
-                            color: STATUS_COLORS[o.status]?.color,
-                            whiteSpace: 'nowrap',
-                          }}>
+                  </thead>
+                  <tbody>
+                    {orders.length === 0 ? (
+                      <tr>
+                        <td colSpan={7} style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
+                          尚無訂單
+                        </td>
+                      </tr>
+                    ) : orders.map((o) => (
+                      <tr key={o.id}>
+                        <td>
+                          <div style={{ fontWeight: 700, fontSize: 12, color: 'var(--primary-dark)' }}>{o.order_number}</div>
+                          <div className="admin-cell-sub">
+                            {new Date(o.created_at).toLocaleString('zh-TW', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                          </div>
+                        </td>
+                        <td>
+                          <div style={{ fontWeight: 600 }}>{o.customer_name}</div>
+                          <div className="admin-cell-sub" style={{ color: 'var(--text)' }}>{o.customer_phone || '—'}</div>
+                          <div className="admin-cell-sub" style={{ color: 'var(--text)' }}>{o.customer_email || '—'}</div>
+                          {o.line_id && <div className="admin-cell-sub" style={{ color: 'var(--text)' }}>Line: {o.line_id}</div>}
+                        </td>
+                        <td>
+                          <div style={{ fontSize: 13 }}>{SHIPPING_LABELS[o.shipping_method] || '—'}</div>
+                          <div className="admin-cell-sub">
+                            匯款後五碼：<span style={{ fontFamily: 'monospace', fontWeight: 700, letterSpacing: 1 }}>{o.transfer_last5 || '—'}</span>
+                          </div>
+                        </td>
+                        <td style={{ maxWidth: 200 }}>
+                          <div className="admin-cell-items">
+                            {(o.items || []).filter(Boolean).map((item, i) => (
+                              <span key={i}>{item.product_name} ×{item.quantity}</span>
+                            ))}
+                          </div>
+                          {o.note && <div className="admin-cell-sub" style={{ marginTop: 4, whiteSpace: 'pre-wrap' }}>備註：{o.note}</div>}
+                        </td>
+                        <td style={{ fontWeight: 700, color: 'var(--primary-dark)', whiteSpace: 'nowrap' }}>
+                          NT${Number(o.total_amount).toLocaleString()}
+                        </td>
+                        <td>
+                          <span className="order-card-status-badge" style={{ background: STATUS_COLORS[o.status]?.bg, color: STATUS_COLORS[o.status]?.color, display: 'inline-block', marginBottom: 6 }}>
                             {STATUS_LABELS[o.status]}
                           </span>
                           <select
                             className="form-select"
-                            style={{ fontSize: 11, padding: '4px 24px 4px 8px', width: 'auto' }}
+                            style={{ fontSize: 11, padding: '4px 24px 4px 8px', width: '100%' }}
                             value={o.status}
                             onChange={(e) => handleStatusChange(o.id, e.target.value)}
                           >
@@ -674,111 +655,89 @@ function Dashboard({ username, onLogout }) {
                               <option key={val} value={val}>{label}</option>
                             ))}
                           </select>
-                        </div>
-                      </td>
-                      <td style={{ fontSize: 12, color: 'var(--text-light)', whiteSpace: 'nowrap' }}>
-                        {new Date(o.created_at).toLocaleString('zh-TW', {
-                          month: '2-digit', day: '2-digit',
-                          hour: '2-digit', minute: '2-digit',
-                        })}
-                      </td>
-                      <td>
-                        <button className="action-btn danger" onClick={() => handleDeleteOrder(o.id, o.order_number)}>
-                          刪除
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
+                        </td>
+                        <td>
+                          <button className="action-btn danger" onClick={() => handleDeleteOrder(o.id, o.order_number)}>刪除</button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
           </>
         )}
 
         {tab === 'transfers' && (
           <>
-          {transfers.length > 0 && (
-            <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '12px 0 0' }}>
-              <button className="btn btn-outline" style={{ fontSize: 13, padding: '7px 16px' }} onClick={() => exportTransfers(transfers)}>
-                匯出 Excel
-              </button>
-            </div>
-          )}
-          <div className="admin-table-wrap">
-            {loadingTransfers ? (
-              <div style={{ padding: '48px', textAlign: 'center', color: 'var(--text-muted)' }}>
-                <div className="spinner dark" style={{ margin: '0 auto 12px' }} />
-                載入中...
+            {transfers.length > 0 && (
+              <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '12px 0 0' }}>
+                <button className="btn btn-outline" style={{ fontSize: 13, padding: '7px 16px' }} onClick={() => exportTransfers(transfers)}>
+                  匯出 Excel
+                </button>
               </div>
-            ) : (
-              <table className="admin-table">
-                <thead>
-                  <tr>
-                    <th>訂單編號</th>
-                    <th>姓名</th>
-                    <th>電話</th>
-                    <th>Email</th>
-                    <th>匯款後五碼</th>
-                    <th>金額</th>
-                    <th>運送方式</th>
-                    <th>狀態</th>
-                    <th>下單時間</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {transfers.length === 0 ? (
+            )}
+            <div className="admin-table-wrap">
+              {loadingTransfers ? (
+                <div style={{ padding: '48px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                  <div className="spinner dark" style={{ margin: '0 auto 12px' }} />載入中...
+                </div>
+              ) : (
+                <table className="admin-table">
+                  <thead>
                     <tr>
-                      <td colSpan={10} style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
-                        尚無匯款回報紀錄
-                      </td>
+                      <th>訂單 / 時間</th>
+                      <th>顧客</th>
+                      <th>匯款後五碼</th>
+                      <th>商品</th>
+                      <th>金額 / 運送</th>
+                      <th>狀態</th>
+                      <th></th>
                     </tr>
-                  ) : transfers.map((o) => (
-                    <tr key={o.id}>
-                      <td style={{ fontWeight: 700, color: 'var(--primary-dark)', fontSize: 12 }}>
-                        {o.order_number}
-                      </td>
-                      <td style={{ fontWeight: 600 }}>{o.customer_name}</td>
-                      <td style={{ fontSize: 12, color: 'var(--text-light)' }}>{o.customer_phone}</td>
-                      <td style={{ fontSize: 12, color: 'var(--text-light)' }}>{o.customer_email}</td>
-                      <td>
-                        <span style={{
-                          display: 'inline-block',
-                          padding: '3px 12px',
-                          background: '#dbeafe',
-                          color: '#1d4ed8',
-                          borderRadius: 20,
-                          fontFamily: 'monospace',
-                          fontWeight: 700,
-                          fontSize: 14,
-                          letterSpacing: 2,
-                        }}>
-                          {o.transfer_last5}
-                        </span>
-                      </td>
-                      <td style={{ fontWeight: 700, color: 'var(--primary-dark)', whiteSpace: 'nowrap' }}>
-                        NT${Number(o.total_amount).toLocaleString()}
-                      </td>
-                      <td style={{ fontSize: 12, whiteSpace: 'nowrap' }}>
-                        {o.shipping_method === '711' && '7-11店到店'}
-                        {o.shipping_method === 'delivery' && '宅配地址'}
-                        {o.shipping_method === 'pickup' && '自取'}
-                      </td>
-                      <td>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'flex-start' }}>
-                          <span style={{
-                            display: 'inline-block', padding: '3px 10px', borderRadius: 20,
-                            fontSize: 12, fontWeight: 600,
-                            background: STATUS_COLORS[o.status]?.bg,
-                            color: STATUS_COLORS[o.status]?.color,
-                            whiteSpace: 'nowrap',
-                          }}>
+                  </thead>
+                  <tbody>
+                    {transfers.length === 0 ? (
+                      <tr>
+                        <td colSpan={7} style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
+                          尚無匯款回報紀錄
+                        </td>
+                      </tr>
+                    ) : transfers.map((o) => (
+                      <tr key={o.id}>
+                        <td>
+                          <div style={{ fontWeight: 700, fontSize: 12, color: 'var(--primary-dark)' }}>{o.order_number}</div>
+                          <div className="admin-cell-sub">
+                            {new Date(o.created_at).toLocaleString('zh-TW', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                          </div>
+                        </td>
+                        <td>
+                          <div style={{ fontWeight: 600 }}>{o.customer_name}</div>
+                          <div className="admin-cell-sub" style={{ color: 'var(--text)' }}>{o.customer_phone}</div>
+                          <div className="admin-cell-sub" style={{ color: 'var(--text)' }}>{o.customer_email}</div>
+                        </td>
+                        <td>
+                          <span style={{ fontFamily: 'monospace', fontSize: 18, fontWeight: 700, color: '#1d4ed8', letterSpacing: 2 }}>
+                            {o.transfer_last5}
+                          </span>
+                        </td>
+                        <td style={{ maxWidth: 180 }}>
+                          <div className="admin-cell-items">
+                            {(o.items || []).filter(Boolean).map((item, i) => (
+                              <span key={i}>{item.product_name} ×{item.quantity}</span>
+                            ))}
+                          </div>
+                        </td>
+                        <td>
+                          <div style={{ fontWeight: 700, color: 'var(--primary-dark)' }}>NT${Number(o.total_amount).toLocaleString()}</div>
+                          <div className="admin-cell-sub">{SHIPPING_LABELS[o.shipping_method] || '—'}</div>
+                        </td>
+                        <td>
+                          <span className="order-card-status-badge" style={{ background: STATUS_COLORS[o.status]?.bg, color: STATUS_COLORS[o.status]?.color, display: 'inline-block', marginBottom: 6 }}>
                             {STATUS_LABELS[o.status]}
                           </span>
                           <select
                             className="form-select"
-                            style={{ fontSize: 11, padding: '4px 24px 4px 8px', width: 'auto' }}
+                            style={{ fontSize: 11, padding: '4px 24px 4px 8px', width: '100%' }}
                             value={o.status}
                             onChange={(e) => handleStatusChange(o.id, e.target.value)}
                           >
@@ -786,25 +745,16 @@ function Dashboard({ username, onLogout }) {
                               <option key={val} value={val}>{label}</option>
                             ))}
                           </select>
-                        </div>
-                      </td>
-                      <td style={{ fontSize: 12, color: 'var(--text-light)', whiteSpace: 'nowrap' }}>
-                        {new Date(o.created_at).toLocaleString('zh-TW', {
-                          month: '2-digit', day: '2-digit',
-                          hour: '2-digit', minute: '2-digit',
-                        })}
-                      </td>
-                      <td>
-                        <button className="action-btn danger" onClick={() => handleDeleteOrder(o.id, o.order_number)}>
-                          刪除
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
+                        </td>
+                        <td>
+                          <button className="action-btn danger" onClick={() => handleDeleteOrder(o.id, o.order_number)}>刪除</button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
           </>
         )}
       </div>
