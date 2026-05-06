@@ -31,7 +31,11 @@ export default function TransferPage() {
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identity.customer_email)) {
       errs.customer_email = 'Email 格式不正確';
     }
-    if (!identity.customer_phone.trim()) errs.customer_phone = '請填寫聯絡電話';
+    if (!identity.customer_phone.trim()) {
+      errs.customer_phone = '請填寫聯絡電話';
+    } else if (!/^\d{8,}$/.test(identity.customer_phone.trim())) {
+      errs.customer_phone = '電話須為純數字且至少 8 碼';
+    }
     return errs;
   }
 
@@ -164,12 +168,14 @@ export default function TransferPage() {
                   className="form-input"
                   name="customer_phone"
                   type="tel"
+                  inputMode="numeric"
                   value={identity.customer_phone}
                   onChange={(e) => {
-                    setIdentity((p) => ({ ...p, customer_phone: e.target.value }));
+                    const v = e.target.value.replace(/\D/g, '');
+                    setIdentity((p) => ({ ...p, customer_phone: v }));
                     if (identityErrors.customer_phone) setIdentityErrors((p) => ({ ...p, customer_phone: '' }));
                   }}
-                  placeholder="請輸入下單時填寫的聯絡電話"
+                  placeholder="請輸入下單時填寫的聯絡電話（純數字）"
                 />
                 {identityErrors.customer_phone && <div className="form-error">{identityErrors.customer_phone}</div>}
               </div>

@@ -44,7 +44,11 @@ export default function CheckoutPage() {
   function validate() {
     const errs = {};
     if (!form.customer_name.trim()) errs.customer_name = '請填寫姓名';
-    if (!form.customer_phone.trim()) errs.customer_phone = '請填寫聯絡電話';
+    if (!form.customer_phone.trim()) {
+      errs.customer_phone = '請填寫聯絡電話';
+    } else if (!/^\d{8,}$/.test(form.customer_phone.trim())) {
+      errs.customer_phone = '電話須為純數字且至少 8 碼';
+    }
     if (!form.customer_email.trim()) {
       errs.customer_email = '請填寫 Email';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.customer_email)) {
@@ -120,9 +124,14 @@ export default function CheckoutPage() {
                 className="form-input"
                 name="customer_phone"
                 type="tel"
+                inputMode="numeric"
                 value={form.customer_phone}
-                onChange={handleChange}
-                placeholder="請輸入聯絡電話"
+                onChange={(e) => {
+                  const v = e.target.value.replace(/\D/g, '');
+                  setForm((p) => ({ ...p, customer_phone: v }));
+                  if (errors.customer_phone) setErrors((p) => ({ ...p, customer_phone: '' }));
+                }}
+                placeholder="請輸入聯絡電話（純數字）"
               />
               {errors.customer_phone && <div className="form-error">{errors.customer_phone}</div>}
             </div>
