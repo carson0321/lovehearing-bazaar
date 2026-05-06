@@ -39,6 +39,9 @@ export default function OrderSuccessPage() {
           <div style={{ fontSize: 12, color: 'var(--text-light)', marginTop: 8, lineHeight: 1.6 }}>
             匯款完成後，請點下方按鈕填寫帳號後五碼，協會確認後將盡快安排出貨。
           </div>
+          <div className="expire-warning">
+            ⚠ 請務必於下單後 <strong>1 小時內</strong>完成匯款，逾時訂單將自動取消並釋出庫存
+          </div>
         </div>
 
         <Link to="/transfer" className="btn btn-primary" style={{ display: 'block', textAlign: 'center', marginBottom: 12, padding: '13px' }}>

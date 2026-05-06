@@ -202,6 +202,9 @@ export default function CheckoutPage() {
               <div style={{ fontSize: 12, color: 'var(--text-light)', marginTop: 6 }}>
                 下單後請完成匯款，再至「匯款回報」頁面填寫帳號後五碼
               </div>
+              <div className="expire-warning">
+                ⚠ 請務必於下單後 <strong>1 小時內</strong>完成匯款，逾時訂單將自動取消並釋出庫存
+              </div>
             </div>
 
             <div className="form-group">

@@ -1686,6 +1686,17 @@ select {
 }
 
 /* ===== Bank info box ===== */
+.expire-warning {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  color: #c2410c;
+  line-height: 1.6;
+}
+
 .bank-info-box {
   background: #fffbf0;
   border: 1px solid #f5d78e;
