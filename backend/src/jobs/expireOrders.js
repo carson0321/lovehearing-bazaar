@@ -1,6 +1,6 @@
 const { pool } = require('../db');
 
-const TIMEOUT_HOURS = 3;
+const TIMEOUT_HOURS = 1;
 const INTERVAL_MS = 5 * 60 * 1000; // run every 5 minutes
 
 async function expireOrders() {

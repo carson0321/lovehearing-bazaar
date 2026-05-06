@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import * as XLSX from 'xlsx';
 import { api } from '../api';
 
 const EMPTY_FORM = {
@@ -23,7 +24,49 @@ const STATUS_COLORS = {
   expired:   { bg: '#f3e8ff', color: '#7e22ce' },
 };
 
+const SHIPPING_LABELS = { '711': '7-11店到店', delivery: '宅配', pickup: '自取' };
+
 const CATEGORIES = ['義賣商品', '生活用品', '食品', '文具', '書籍', '手工藝品'];
+
+function exportOrders(orders) {
+  const rows = orders.map((o) => ({
+    '訂單編號': o.order_number,
+    '姓名': o.customer_name,
+    '電話': o.customer_phone || '',
+    'Email': o.customer_email || '',
+    'Line ID': o.line_id || '',
+    '運送方式': SHIPPING_LABELS[o.shipping_method] || o.shipping_method || '',
+    '匯款後五碼': o.transfer_last5 || '',
+    '商品': (o.items || []).filter(Boolean).map((i) => `${i.product_name}×${i.quantity}`).join('、'),
+    '備註': o.note || '',
+    '金額': Number(o.total_amount),
+    '狀態': STATUS_LABELS[o.status] || o.status,
+    '下單時間': new Date(o.created_at).toLocaleString('zh-TW'),
+  }));
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, '訂單');
+  XLSX.writeFile(wb, `orders_${new Date().toISOString().slice(0, 10)}.xlsx`);
+}
+
+function exportTransfers(transfers) {
+  const rows = transfers.map((o) => ({
+    '訂單編號': o.order_number,
+    '姓名': o.customer_name,
+    '電話': o.customer_phone || '',
+    'Email': o.customer_email || '',
+    '匯款後五碼': o.transfer_last5 || '',
+    '金額': Number(o.total_amount),
+    '運送方式': SHIPPING_LABELS[o.shipping_method] || o.shipping_method || '',
+    '商品': (o.items || []).filter(Boolean).map((i) => `${i.product_name}×${i.quantity}`).join('、'),
+    '狀態': STATUS_LABELS[o.status] || o.status,
+    '下單時間': new Date(o.created_at).toLocaleString('zh-TW'),
+  }));
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, '匯款回報');
+  XLSX.writeFile(wb, `transfers_${new Date().toISOString().slice(0, 10)}.xlsx`);
+}
 
 export default function AdminPage() {
   const [token, setToken] = useState(localStorage.getItem('admin_token') || '');
@@ -523,6 +566,14 @@ function Dashboard({ username, onLogout }) {
         )}
 
         {tab === 'orders' && (
+          <>
+          {orders.length > 0 && (
+            <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '12px 0 0' }}>
+              <button className="btn btn-outline" style={{ fontSize: 13, padding: '7px 16px' }} onClick={() => exportOrders(orders)}>
+                匯出 Excel
+              </button>
+            </div>
+          )}
           <div className="admin-table-wrap">
             {loadingOrders ? (
               <div style={{ padding: '48px', textAlign: 'center', color: 'var(--text-muted)' }}>
@@ -541,6 +592,7 @@ function Dashboard({ username, onLogout }) {
                     <th>運送方式</th>
                     <th>匯款後五碼</th>
                     <th>商品</th>
+                    <th>備註</th>
                     <th>金額</th>
                     <th>狀態</th>
                     <th>下單時間</th>
@@ -549,7 +601,7 @@ function Dashboard({ username, onLogout }) {
                 <tbody>
                   {orders.length === 0 ? (
                     <tr>
-                      <td colSpan={11} style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
+                      <td colSpan={12} style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
                         尚無訂單
                       </td>
                     </tr>
@@ -579,6 +631,9 @@ function Dashboard({ username, onLogout }) {
                             </div>
                           ))}
                         </div>
+                      </td>
+                      <td style={{ fontSize: 12, color: 'var(--text-light)', maxWidth: 160, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                        {o.note || '—'}
                       </td>
                       <td style={{ fontWeight: 700, color: 'var(--primary-dark)', whiteSpace: 'nowrap' }}>
                         NT${Number(o.total_amount).toLocaleString()}
@@ -621,9 +676,18 @@ function Dashboard({ username, onLogout }) {
               </table>
             )}
           </div>
+          </>
         )}
 
         {tab === 'transfers' && (
+          <>
+          {transfers.length > 0 && (
+            <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '12px 0 0' }}>
+              <button className="btn btn-outline" style={{ fontSize: 13, padding: '7px 16px' }} onClick={() => exportTransfers(transfers)}>
+                匯出 Excel
+              </button>
+            </div>
+          )}
           <div className="admin-table-wrap">
             {loadingTransfers ? (
               <div style={{ padding: '48px', textAlign: 'center', color: 'var(--text-muted)' }}>
@@ -718,6 +782,7 @@ function Dashboard({ username, onLogout }) {
               </table>
             )}
           </div>
+          </>
         )}
       </div>
     </div>
