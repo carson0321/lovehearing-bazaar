@@ -297,6 +297,17 @@ function Dashboard({ username, onLogout }) {
     } catch {}
   }
 
+  async function handleDeleteOrder(id, orderNumber) {
+    if (!window.confirm(`確定要刪除訂單 ${orderNumber}？此操作無法復原。`)) return;
+    try {
+      await api.deleteOrder(id);
+      if (tab === 'transfers') fetchTransfers();
+      else fetchOrders();
+    } catch (err) {
+      alert(err.message || '刪除失敗');
+    }
+  }
+
   async function handleStatusChange(orderId, status) {
     try {
       await api.updateOrderStatus(orderId, status);
@@ -596,12 +607,13 @@ function Dashboard({ username, onLogout }) {
                     <th>金額</th>
                     <th>狀態</th>
                     <th>下單時間</th>
+                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
                   {orders.length === 0 ? (
                     <tr>
-                      <td colSpan={12} style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
+                      <td colSpan={13} style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
                         尚無訂單
                       </td>
                     </tr>
@@ -670,6 +682,11 @@ function Dashboard({ username, onLogout }) {
                           hour: '2-digit', minute: '2-digit',
                         })}
                       </td>
+                      <td>
+                        <button className="action-btn danger" onClick={() => handleDeleteOrder(o.id, o.order_number)}>
+                          刪除
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -707,12 +724,13 @@ function Dashboard({ username, onLogout }) {
                     <th>運送方式</th>
                     <th>狀態</th>
                     <th>下單時間</th>
+                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
                   {transfers.length === 0 ? (
                     <tr>
-                      <td colSpan={9} style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
+                      <td colSpan={10} style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
                         尚無匯款回報紀錄
                       </td>
                     </tr>
@@ -775,6 +793,11 @@ function Dashboard({ username, onLogout }) {
                           month: '2-digit', day: '2-digit',
                           hour: '2-digit', minute: '2-digit',
                         })}
+                      </td>
+                      <td>
+                        <button className="action-btn danger" onClick={() => handleDeleteOrder(o.id, o.order_number)}>
+                          刪除
+                        </button>
                       </td>
                     </tr>
                   ))}

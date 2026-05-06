@@ -45,6 +45,7 @@ export const api = {
   getOrders: () => request('/orders'),
   updateOrderStatus: (id, status) =>
     request(`/orders/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
+  deleteOrder: (id) => request(`/orders/${id}`, { method: 'DELETE' }),
   lookupOrders: (body) => request('/orders/transfer/lookup', { method: 'POST', body: JSON.stringify(body) }),
   reportTransfer: (body) => request('/orders/transfer', { method: 'POST', body: JSON.stringify(body) }),
   getTransfers: () => request('/orders/transfers'),

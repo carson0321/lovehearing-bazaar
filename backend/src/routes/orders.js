@@ -121,6 +121,46 @@ router.patch('/:id/status', authMiddleware, async (req, res) => {
   }
 });
 
+router.delete('/:id', authMiddleware, async (req, res) => {
+  const { id } = req.params;
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    const orderResult = await client.query('SELECT status FROM orders WHERE id = $1', [id]);
+    if (orderResult.rows.length === 0) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ error: '訂單不存在' });
+    }
+    const { status } = orderResult.rows[0];
+
+    // Restore stock only if payment was never confirmed
+    if (status === 'pending' || status === 'confirmed') {
+      const items = await client.query(
+        'SELECT product_id, quantity FROM order_items WHERE order_id = $1',
+        [id]
+      );
+      for (const item of items.rows) {
+        await client.query(
+          'UPDATE products SET stock = stock + $1 WHERE id = $2',
+          [item.quantity, item.product_id]
+        );
+      }
+    }
+
+    await client.query('DELETE FROM order_items WHERE order_id = $1', [id]);
+    await client.query('DELETE FROM orders WHERE id = $1', [id]);
+    await client.query('COMMIT');
+    res.json({ ok: true });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    console.error(err);
+    res.status(500).json({ error: '伺服器錯誤' });
+  } finally {
+    client.release();
+  }
+});
+
 // 客戶查詢訂單（驗證 email + 電話）
 router.post('/transfer/lookup', async (req, res) => {
   const { customer_email, customer_phone } = req.body;
