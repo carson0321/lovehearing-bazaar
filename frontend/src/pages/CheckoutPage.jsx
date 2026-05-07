@@ -131,7 +131,7 @@ export default function CheckoutPage() {
                   setForm((p) => ({ ...p, customer_phone: v }));
                   if (errors.customer_phone) setErrors((p) => ({ ...p, customer_phone: '' }));
                 }}
-                placeholder="請輸入聯絡電話（純數字）"
+                placeholder="請輸入聯絡電話"
               />
               {errors.customer_phone && <div className="form-error">{errors.customer_phone}</div>}
             </div>

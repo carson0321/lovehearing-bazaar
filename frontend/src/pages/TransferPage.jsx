@@ -175,7 +175,7 @@ export default function TransferPage() {
                     setIdentity((p) => ({ ...p, customer_phone: v }));
                     if (identityErrors.customer_phone) setIdentityErrors((p) => ({ ...p, customer_phone: '' }));
                   }}
-                  placeholder="請輸入下單時填寫的聯絡電話（純數字）"
+                  placeholder="請輸入下單時填寫的聯絡電話"
                 />
                 {identityErrors.customer_phone && <div className="form-error">{identityErrors.customer_phone}</div>}
               </div>
