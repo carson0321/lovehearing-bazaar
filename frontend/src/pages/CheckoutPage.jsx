@@ -20,6 +20,9 @@ export default function CheckoutPage() {
     line_id: '',
     note: '',
     shipping_method: '',
+    shipping_address: '',
+    store_name: '',
+    store_id: '',
   });
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
@@ -55,6 +58,13 @@ export default function CheckoutPage() {
       errs.customer_email = 'Email 格式不正確';
     }
     if (!form.shipping_method) errs.shipping_method = '請選擇運送方式';
+    if (form.shipping_method === 'delivery' && !form.shipping_address.trim()) {
+      errs.shipping_address = '請填寫收件地址';
+    }
+    if (form.shipping_method === '711') {
+      if (!form.store_name.trim()) errs.store_name = '請填寫門市名稱';
+      if (!form.store_id.trim()) errs.store_id = '請填寫門市店號';
+    }
     return errs;
   }
 
@@ -187,6 +197,63 @@ export default function CheckoutPage() {
                 ))}
               </div>
               {errors.shipping_method && <div className="form-error">{errors.shipping_method}</div>}
+
+              {/* Delivery address */}
+              {form.shipping_method === 'delivery' && (
+                <div style={{ marginTop: 12, padding: '16px', background: 'var(--bg)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-light)' }}>
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label className="form-label">收件地址 <span className="required">*</span></label>
+                    <input
+                      className="form-input"
+                      name="shipping_address"
+                      value={form.shipping_address}
+                      onChange={handleChange}
+                      placeholder="請輸入完整收件地址（縣市、鄉鎮市區、街道、門牌號碼）"
+                    />
+                    {errors.shipping_address && <div className="form-error">{errors.shipping_address}</div>}
+                  </div>
+                </div>
+              )}
+
+              {/* 7-11 store selector */}
+              {form.shipping_method === '711' && (
+                <div style={{ marginTop: 12, padding: '16px', background: 'var(--bg)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-light)' }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 4, color: 'var(--text)' }}>取貨門市資訊</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12, lineHeight: 1.6 }}>
+                    請先至{' '}
+                    <a href="https://emap.pcsc.com.tw/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary-dark)' }}>
+                      7-11 電子地圖
+                    </a>
+                    {' '}查詢門市名稱與店號後填入。
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">門市名稱 <span className="required">*</span></label>
+                    <input
+                      className="form-input"
+                      name="store_name"
+                      value={form.store_name}
+                      onChange={handleChange}
+                      placeholder="例：台北長新門市"
+                    />
+                    {errors.store_name && <div className="form-error">{errors.store_name}</div>}
+                  </div>
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label className="form-label">門市店號 <span className="required">*</span></label>
+                    <input
+                      className="form-input"
+                      name="store_id"
+                      value={form.store_id}
+                      onChange={(e) => {
+                        setForm((p) => ({ ...p, store_id: e.target.value }));
+                        if (errors.store_id) setErrors((p) => ({ ...p, store_id: '' }));
+                      }}
+                      placeholder="例：136842"
+                      inputMode="numeric"
+                    />
+                    {errors.store_id && <div className="form-error">{errors.store_id}</div>}
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="bank-info-box">

@@ -19,6 +19,11 @@ async function initDB() {
     await client.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS shipping_method VARCHAR(20) NOT NULL DEFAULT 'pickup'`);
     await client.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS transfer_last5 CHAR(5)`);
 
+    // Migration 003: 宅配地址 + 7-11 門市資訊
+    await client.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS shipping_address VARCHAR(500)`);
+    await client.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS store_name VARCHAR(100)`);
+    await client.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS store_id VARCHAR(20)`);
+
     // Migration 001: 商品多圖支援
     await client.query(`
       CREATE TABLE IF NOT EXISTS product_images (

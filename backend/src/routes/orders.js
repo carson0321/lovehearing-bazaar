@@ -7,13 +7,19 @@ const router = express.Router();
 const SHIPPING_FEES = { '711': 80, delivery: 100, pickup: 0 };
 
 router.post('/', async (req, res) => {
-  const { customer_name, customer_email, customer_phone, line_id, note, shipping_method, items } = req.body;
+  const { customer_name, customer_email, customer_phone, line_id, note, shipping_method, items, shipping_address, store_name, store_id } = req.body;
 
   if (!customer_name || !customer_email || !customer_phone || !shipping_method || !items || items.length === 0) {
     return res.status(400).json({ error: '請填寫所有必填欄位並選擇至少一件商品' });
   }
   if (!SHIPPING_FEES.hasOwnProperty(shipping_method)) {
     return res.status(400).json({ error: '無效的運送方式' });
+  }
+  if (shipping_method === 'delivery' && !shipping_address?.trim()) {
+    return res.status(400).json({ error: '宅配方式請填寫收件地址' });
+  }
+  if (shipping_method === '711' && (!store_name?.trim() || !store_id?.trim())) {
+    return res.status(400).json({ error: '7-11取貨請填寫門市名稱與門市店號' });
   }
 
   const client = await pool.connect();
@@ -51,9 +57,9 @@ router.post('/', async (req, res) => {
 
     const orderNumber = 'ORD-' + Date.now().toString().slice(-8);
     const orderResult = await client.query(
-      `INSERT INTO orders (order_number, customer_name, customer_email, customer_phone, line_id, note, shipping_method, total_amount)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
-      [orderNumber, customer_name, customer_email, customer_phone, line_id || '', note || '', shipping_method, grandTotal]
+      `INSERT INTO orders (order_number, customer_name, customer_email, customer_phone, line_id, note, shipping_method, total_amount, shipping_address, store_name, store_id)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`,
+      [orderNumber, customer_name, customer_email, customer_phone, line_id || '', note || '', shipping_method, grandTotal, shipping_address || null, store_name || null, store_id || null]
     );
     const order = orderResult.rows[0];
 

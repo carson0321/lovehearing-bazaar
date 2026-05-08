@@ -57,6 +57,9 @@ function exportOrders(orders) {
     'Email': o.customer_email || '',
     'Line ID': o.line_id || '',
     '運送方式': SHIPPING_LABELS[o.shipping_method] || o.shipping_method || '',
+    '收件地址': o.shipping_address || '',
+    '門市名稱': o.store_name || '',
+    '門市店號': o.store_id || '',
     '匯款後五碼': o.transfer_last5 || '',
     '商品': (o.items || []).filter(Boolean).map((i) => `${i.product_name}×${i.quantity}`).join('、'),
     '備註': o.note || '',
@@ -79,6 +82,9 @@ function exportTransfers(transfers) {
     '匯款後五碼': o.transfer_last5 || '',
     '金額': Number(o.total_amount),
     '運送方式': SHIPPING_LABELS[o.shipping_method] || o.shipping_method || '',
+    '收件地址': o.shipping_address || '',
+    '門市名稱': o.store_name || '',
+    '門市店號': o.store_id || '',
     '商品': (o.items || []).filter(Boolean).map((i) => `${i.product_name}×${i.quantity}`).join('、'),
     '狀態': STATUS_LABELS[o.status] || o.status,
     '下單時間': new Date(o.created_at).toLocaleString('zh-TW'),
@@ -648,6 +654,12 @@ function Dashboard({ username, onLogout }) {
                         </td>
                         <td>
                           <div style={{ fontSize: 13 }}>{SHIPPING_LABELS[o.shipping_method] || '—'}</div>
+                          {o.shipping_method === 'delivery' && o.shipping_address && (
+                            <div className="admin-cell-sub">{o.shipping_address}</div>
+                          )}
+                          {o.shipping_method === '711' && o.store_name && (
+                            <div className="admin-cell-sub">{o.store_name}（{o.store_id}）</div>
+                          )}
                           <div className="admin-cell-sub">
                             匯款後五碼：<span style={{ fontFamily: 'monospace', fontWeight: 700, letterSpacing: 1 }}>{o.transfer_last5 || '—'}</span>
                           </div>
@@ -752,6 +764,12 @@ function Dashboard({ username, onLogout }) {
                         <td>
                           <div style={{ fontWeight: 700, color: 'var(--primary-dark)' }}>NT${Number(o.total_amount).toLocaleString()}</div>
                           <div className="admin-cell-sub">{SHIPPING_LABELS[o.shipping_method] || '—'}</div>
+                          {o.shipping_method === 'delivery' && o.shipping_address && (
+                            <div className="admin-cell-sub">{o.shipping_address}</div>
+                          )}
+                          {o.shipping_method === '711' && o.store_name && (
+                            <div className="admin-cell-sub">{o.store_name}（{o.store_id}）</div>
+                          )}
                         </td>
                         <td>
                           <span className="order-card-status-badge" style={{ background: STATUS_COLORS[o.status]?.bg, color: STATUS_COLORS[o.status]?.color, display: 'inline-block', marginBottom: 6 }}>
