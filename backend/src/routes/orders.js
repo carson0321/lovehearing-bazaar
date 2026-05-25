@@ -112,18 +112,48 @@ router.patch('/:id/status', authMiddleware, async (req, res) => {
     return res.status(400).json({ error: '無效的訂單狀態' });
   }
 
+  const STOCK_RELEASED = new Set(['cancelled', 'expired']);
+
+  const client = await pool.connect();
   try {
-    const result = await pool.query(
+    await client.query('BEGIN');
+
+    const orderResult = await client.query(
+      'SELECT status FROM orders WHERE id = $1 FOR UPDATE',
+      [id]
+    );
+    if (orderResult.rows.length === 0) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ error: '訂單不存在' });
+    }
+    const oldStatus = orderResult.rows[0].status;
+
+    // Restore stock when transitioning into a released state from a non-released state
+    if (STOCK_RELEASED.has(status) && !STOCK_RELEASED.has(oldStatus)) {
+      const items = await client.query(
+        'SELECT product_id, quantity FROM order_items WHERE order_id = $1',
+        [id]
+      );
+      for (const item of items.rows) {
+        await client.query(
+          'UPDATE products SET stock = stock + $1 WHERE id = $2',
+          [item.quantity, item.product_id]
+        );
+      }
+    }
+
+    const result = await client.query(
       'UPDATE orders SET status = $1 WHERE id = $2 RETURNING *',
       [status, id]
     );
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: '訂單不存在' });
-    }
+    await client.query('COMMIT');
     res.json(result.rows[0]);
   } catch (err) {
+    await client.query('ROLLBACK');
     console.error(err);
     res.status(500).json({ error: '伺服器錯誤' });
+  } finally {
+    client.release();
   }
 });
 

@@ -217,8 +217,6 @@ function Dashboard({ username, onLogout }) {
       .finally(() => setLoadingOrders(false));
   }, []);
 
-  useEffect(() => { fetchProducts(); }, [fetchProducts]);
-
   const fetchTransfers = useCallback(() => {
     setLoadingTransfers(true);
     api.getTransfers()
@@ -228,9 +226,10 @@ function Dashboard({ username, onLogout }) {
   }, []);
 
   useEffect(() => {
+    if (tab === 'products') fetchProducts();
     if (tab === 'orders') fetchOrders();
     if (tab === 'transfers') fetchTransfers();
-  }, [tab, fetchOrders, fetchTransfers]);
+  }, [tab, fetchProducts, fetchOrders, fetchTransfers]);
 
   async function handleSaveProduct(e) {
     e.preventDefault();
@@ -685,7 +684,7 @@ function Dashboard({ username, onLogout }) {
                             value={o.status}
                             onChange={(e) => handleStatusChange(o.id, e.target.value)}
                           >
-                            {Object.entries(STATUS_LABELS).map(([val, label]) => (
+                            {Object.entries(STATUS_LABELS).filter(([val]) => val !== 'expired').map(([val, label]) => (
                               <option key={val} value={val}>{label}</option>
                             ))}
                           </select>
@@ -781,7 +780,7 @@ function Dashboard({ username, onLogout }) {
                             value={o.status}
                             onChange={(e) => handleStatusChange(o.id, e.target.value)}
                           >
-                            {Object.entries(STATUS_LABELS).map(([val, label]) => (
+                            {Object.entries(STATUS_LABELS).filter(([val]) => val !== 'expired').map(([val, label]) => (
                               <option key={val} value={val}>{label}</option>
                             ))}
                           </select>
