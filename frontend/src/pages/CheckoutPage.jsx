@@ -281,7 +281,7 @@ export default function CheckoutPage() {
                 name="note"
                 value={form.note}
                 onChange={handleChange}
-                placeholder="如有特殊需求請在此說明（選填）"
+                placeholder="如需認購證明或其他特殊需求，請在此說明。"
               />
             </div>
 
@@ -296,7 +296,8 @@ export default function CheckoutPage() {
                 lineHeight: 1.7,
               }}
             >
-              💛 義賣所得將全數捐助蒲公英聽語協會，支持聽損兒童的語言治療、教育服務與聽損族群的需要。感謝您的愛心！
+              💛 感謝您透過公益認購支持我們的服務行動 💛<br/>
+              本次為義賣性質活動，所有收益將全數用於支持聽損者及家庭的服務。因此提供「認購證明」，無法開立捐款收據。如需認購證明，請於結帳時備註。<br/>
               <div style={{ marginTop: 8, fontSize: 12, color: 'var(--text-muted)' }}>
                 公益勸募許可字號 115年02月09日北市社團字第115030052號
               </div>

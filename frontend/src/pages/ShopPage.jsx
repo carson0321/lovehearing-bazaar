@@ -35,7 +35,11 @@ export default function ShopPage() {
         </h1>
         <p className="hero-desc">
           蒲公英聽語協會義賣商品，每件皆由善心人士捐贈與愛心志工精心嚴選。
-          所有收益將全數用於支持聽損兒童的語言治療、教育服務與聽損族群的需要。
+          所有收益將全數用於支持聽損者及家庭的服務。<br />
+          <br />
+          <div style={{ color: 'var(--text-muted)' }}>
+            公益勸募許可字號 115年02月09日北市社團字第115030052號
+          </div>
         </p>
         <div className="hero-stats">
           <div className="hero-stat">
